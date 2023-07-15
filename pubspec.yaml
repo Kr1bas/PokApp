@@ -1,0 +1,242 @@
+name: pokapp
+description: A new Flutter project.
+
+# The following line prevents the package from being accidentally published to
+# pub.dev using `flutter pub publish`. This is preferred for private packages.
+publish_to: 'none' # Remove this line if you wish to publish to pub.dev
+
+# The following defines the version and build number for your application.
+# A version number is three numbers separated by dots, like 1.2.43
+# followed by an optional build number separated by a +.
+# Both the version and the builder number may be overridden in flutter
+# build by specifying --build-name and --build-number, respectively.
+# In Android, build-name is used as versionName while build-number used as versionCode.
+# Read more about Android versioning at https://developer.android.com/studio/publish/versioning
+# In iOS, build-name is used as CFBundleShortVersionString while build-number is used as CFBundleVersion.
+# Read more about iOS versioning at
+# https://developer.apple.com/library/archive/documentation/General/Reference/InfoPlistKeyReference/Articles/CoreFoundationKeys.html
+# In Windows, build-name is used as the major, minor, and patch parts
+# of the product and file versions while build-number is used as the build suffix.
+version: 1.0.0+1
+
+environment:
+  sdk: '>=2.18.6 <3.0.0'
+
+# Dependencies specify other packages that your package needs in order to work.
+# To automatically upgrade your package dependencies to the latest versions
+# consider running `flutter pub upgrade --major-versions`. Alternatively,
+# dependencies can be manually updated by changing the version numbers below to
+# the latest version available on pub.dev. To see which dependencies have newer
+# versions available, run `flutter pub outdated`.
+dependencies:
+  flutter:
+    sdk: flutter
+
+
+  # The following adds the Cupertino Icons font to your application.
+  # Use with the CupertinoIcons class for iOS style icons.
+  cupertino_icons: ^1.0.2
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+
+  # The "flutter_lints" package below contains a set of recommended lints to
+  # encourage good coding practices. The lint set provided by the package is
+  # activated in the `analysis_options.yaml` file located at the root of your
+  # package. See that file for information about deactivating specific lint
+  # rules and activating additional ones.
+  flutter_lints: ^2.0.0
+
+# For information on the generic Dart part of this file, see the
+# following page: https://dart.dev/tools/pub/pubspec
+
+# The following section is specific to Flutter packages.
+flutter:
+
+  # The following line ensures that the Material Icons font is
+  # included with your application, so that you can use the icons in
+  # the material Icons class.
+  uses-material-design: true
+
+  # To add assets to your application, add an assets section, like this:
+  assets:
+    - assets/images/001.png
+    - assets/images/002.png
+    - assets/images/003.png
+    - assets/images/004.png
+    - assets/images/005.png
+    - assets/images/006.png
+    - assets/images/007.png
+    - assets/images/008.png
+    - assets/images/009.png
+    - assets/images/010.png
+    - assets/images/011.png
+    - assets/images/012.png
+    - assets/images/013.png
+    - assets/images/014.png
+    - assets/images/015.png
+    - assets/images/016.png
+    - assets/images/017.png
+    - assets/images/018.png
+    - assets/images/019.png
+    - assets/images/020.png
+    - assets/images/021.png
+    - assets/images/022.png
+    - assets/images/023.png
+    - assets/images/024.png
+    - assets/images/025.png
+    - assets/images/026.png
+    - assets/images/027.png
+    - assets/images/028.png
+    - assets/images/029.png
+    - assets/images/030.png
+    - assets/images/031.png
+    - assets/images/032.png
+    - assets/images/033.png
+    - assets/images/034.png
+    - assets/images/035.png
+    - assets/images/036.png
+    - assets/images/037.png
+    - assets/images/038.png
+    - assets/images/039.png
+    - assets/images/040.png
+    - assets/images/041.png
+    - assets/images/042.png
+    - assets/images/043.png
+    - assets/images/044.png
+    - assets/images/045.png
+    - assets/images/046.png
+    - assets/images/047.png
+    - assets/images/048.png
+    - assets/images/049.png
+    - assets/images/050.png
+    - assets/images/051.png
+    - assets/images/052.png
+    - assets/images/053.png
+    - assets/images/054.png
+    - assets/images/055.png
+    - assets/images/056.png
+    - assets/images/057.png
+    - assets/images/058.png
+    - assets/images/059.png
+    - assets/images/060.png
+    - assets/images/061.png
+    - assets/images/062.png
+    - assets/images/063.png
+    - assets/images/064.png
+    - assets/images/065.png
+    - assets/images/066.png
+    - assets/images/067.png
+    - assets/images/068.png
+    - assets/images/069.png
+    - assets/images/070.png
+    - assets/images/071.png
+    - assets/images/072.png
+    - assets/images/073.png
+    - assets/images/074.png
+    - assets/images/075.png
+    - assets/images/076.png
+    - assets/images/077.png
+    - assets/images/078.png
+    - assets/images/079.png
+    - assets/images/080.png
+    - assets/images/081.png
+    - assets/images/082.png
+    - assets/images/083.png
+    - assets/images/084.png
+    - assets/images/085.png
+    - assets/images/086.png
+    - assets/images/087.png
+    - assets/images/088.png
+    - assets/images/089.png
+    - assets/images/090.png
+    - assets/images/091.png
+    - assets/images/092.png
+    - assets/images/093.png
+    - assets/images/094.png
+    - assets/images/095.png
+    - assets/images/096.png
+    - assets/images/097.png
+    - assets/images/098.png
+    - assets/images/099.png
+    - assets/images/100.png
+    - assets/images/101.png
+    - assets/images/102.png
+    - assets/images/103.png
+    - assets/images/104.png
+    - assets/images/105.png
+    - assets/images/106.png
+    - assets/images/107.png
+    - assets/images/108.png
+    - assets/images/109.png
+    - assets/images/110.png
+    - assets/images/111.png
+    - assets/images/112.png
+    - assets/images/113.png
+    - assets/images/114.png
+    - assets/images/115.png
+    - assets/images/116.png
+    - assets/images/117.png
+    - assets/images/118.png
+    - assets/images/119.png
+    - assets/images/120.png
+    - assets/images/121.png
+    - assets/images/122.png
+    - assets/images/123.png
+    - assets/images/124.png
+    - assets/images/125.png
+    - assets/images/126.png
+    - assets/images/127.png
+    - assets/images/128.png
+    - assets/images/129.png
+    - assets/images/130.png
+    - assets/images/131.png
+    - assets/images/132.png
+    - assets/images/133.png
+    - assets/images/134.png
+    - assets/images/135.png
+    - assets/images/136.png
+    - assets/images/137.png
+    - assets/images/138.png
+    - assets/images/139.png
+    - assets/images/140.png
+    - assets/images/141.png
+    - assets/images/142.png
+    - assets/images/143.png
+    - assets/images/144.png
+    - assets/images/145.png
+    - assets/images/146.png
+    - assets/images/147.png
+    - assets/images/148.png
+    - assets/images/149.png
+    - assets/images/150.png
+    - assets/images/151.png
+
+  #   - images/a_dot_ham.jpeg
+
+  # An image asset can refer to one or more resolution-specific "variants", see
+  # https://flutter.dev/assets-and-images/#resolution-aware
+
+  # For details regarding adding assets from package dependencies, see
+  # https://flutter.dev/assets-and-images/#from-packages
+
+  # To add custom fonts to your application, add a fonts section here,
+  # in this "flutter" section. Each entry in this list should have a
+  # "family" key with the font family name, and a "fonts" key with a
+  # list giving the asset and other descriptors for the font. For
+  # example:
+  # fonts:
+  #   - family: Schyler
+  #     fonts:
+  #       - asset: fonts/Schyler-Regular.ttf
+  #       - asset: fonts/Schyler-Italic.ttf
+  #         style: italic
+  #   - family: Trajan Pro
+  #     fonts:
+  #       - asset: fonts/TrajanPro.ttf
+  #       - asset: fonts/TrajanPro_Bold.ttf
+  #         weight: 700
+  #
+  # For details regarding fonts from package dependencies,
+  # see https://flutter.dev/custom-fonts/#from-packages
