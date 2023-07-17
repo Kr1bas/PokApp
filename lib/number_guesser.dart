@@ -100,26 +100,9 @@ class _NumberGuesserGamePageState extends State<NumberGuesserGamePage> {
   Widget build(BuildContext context) {
     Widget child;
     if (_currentPick == -1) {
-      child = Padding(
-        padding: const EdgeInsets.fromLTRB(10, 100, 10, 100),
-        child: DecoratedBox(
-          decoration: BoxDecoration(
-            color: Colors.white,
-            boxShadow: const [
-              BoxShadow(
-                  color: Colors.grey,
-                  offset: Offset.zero,
-                  blurRadius: 4,
-                  spreadRadius: 2,
-                  blurStyle: BlurStyle.normal)
-            ],
-            borderRadius: BorderRadius.circular(20),
-          ),
-          child: ElevatedButton(
-            onPressed: (() => setState(() => _start())),
-            child: const Text("START!"),
-          ),
-        ),
+      child = ElevatedButton(
+        onPressed: (() => setState(() => _start())),
+        child: const Text("START!"),
       );
     } else if (_currentLife == 0) {
       child = Padding(
@@ -167,9 +150,8 @@ class _NumberGuesserGamePageState extends State<NumberGuesserGamePage> {
           ),
           child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
             Text("Current Score: $_currentScore"),
-            GridView.count(
-              crossAxisCount: 1,
-              scrollDirection: Axis.horizontal,
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
               children: _getCurrentLifeIcons(),
             ),
             Image.asset(
