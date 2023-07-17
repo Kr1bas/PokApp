@@ -3,6 +3,7 @@ import 'dart:html';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:pokapp/constants.dart';
 import 'package:pokapp/parallax_scrolling.dart';
 import 'dart:math';
 
@@ -12,11 +13,37 @@ class NumberGuesserHomePage extends StatelessWidget {
   List<DisplayPageItem> getNumberGuesserPageList() {
     final widgets = <DisplayPageItem>[];
     widgets.add(DisplayPageItem(
-      navigateTo: const NumberGuesserGamePage(min: 1, max: 151),
+      navigateTo: const NumberGuesserGamePage(min: kantoStart, max: kantoEnd),
       title: "First Generation",
       subTitle: "Only the original 151!",
       assetImage: "assets/images/covers/pk_frlg.jpg",
     ));
+    widgets.add(DisplayPageItem(
+        navigateTo: const NumberGuesserGamePage(min: jhotoStart, max: jhotoEnd),
+        title: "Second Generation",
+        subTitle: "Only Pokemons from the Jhoto region!",
+        assetImage: "assets/images/covers/pk_hgss.jpg"));
+    widgets.add(DisplayPageItem(
+        navigateTo: const NumberGuesserGamePage(min: hoennStart, max: hoennEnd),
+        title: "Third Generation",
+        subTitle: "Only Pokemons from the Hoenn region!",
+        assetImage: "assets/images/covers/pk_rs.jpg"));
+    widgets.add(DisplayPageItem(
+        navigateTo:
+            const NumberGuesserGamePage(min: sinnohStart, max: sinnohEnd),
+        title: "Fourth Generation",
+        subTitle: "Only Pokemons from the Sinnoh region!",
+        assetImage: "assets/images/covers/pk_dp.jpg"));
+    widgets.add(DisplayPageItem(
+        navigateTo: const NumberGuesserGamePage(min: unimaStart, max: unimaEnd),
+        title: "Fifth Generation",
+        subTitle: "Only Pokemons from the Unima/Unova region!",
+        assetImage: "assets/images/covers/pk_bw.jpg"));
+    widgets.add(DisplayPageItem(
+        navigateTo: const NumberGuesserGamePage(min: kalosStart, max: kalosEnd),
+        title: "Sixth Generation",
+        subTitle: "Only Pokemons from the Kalos region!",
+        assetImage: "assets/images/covers/pk_xy.jpg"));
     return widgets;
   }
 
@@ -24,7 +51,7 @@ class NumberGuesserHomePage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("PokAPP"),
+        title: const Text("PokAPP Number Guess"),
       ),
       body: Center(
         child: SafeArea(
@@ -61,7 +88,8 @@ class _NumberGuesserGamePageState extends State<NumberGuesserGamePage> {
 
   void _start() {
     _currentLife = 3;
-    _currentPick = _rng.nextInt(widget.max - 1) + widget.min;
+    _currentPick = _rng.nextInt(widget.max + widget.min - 2) + widget.min;
+    print(_currentPick);
     _alreadyExtracted.add(_currentPick);
   }
 
@@ -74,6 +102,9 @@ class _NumberGuesserGamePageState extends State<NumberGuesserGamePage> {
         } while (_alreadyExtracted.contains(_currentPick));
       } else {
         _currentLife -= 1;
+        if (_currentLife == 0) {
+          _inputTextController.dispose();
+        }
       }
       _formKey.currentState!.reset();
     }
@@ -175,8 +206,8 @@ class _NumberGuesserGamePageState extends State<NumberGuesserGamePage> {
                     if (value == null || value.isEmpty) {
                       return 'Please enter a value';
                     }
-                    if (int.parse(value) < widget.min ||
-                        int.parse(value) > widget.max) {
+                    int ival = int.parse(value);
+                    if (ival < widget.min || ival > widget.max) {
                       return 'Value must be between ${widget.min} and ${widget.max}.';
                     }
                     return null;
