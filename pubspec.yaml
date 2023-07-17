@@ -844,6 +844,7 @@ flutter:
     - assets/images/covers/pk_yellow.jpg
     #Other
     - assets/images/other/pkdex.png
+    - assets/images/other/pkdex_guess.png
     - assets/images/other/pk_wp_1.jpg
     - assets/images/other/pk_wp_2.jpg
     - assets/images/other/pk_wp_3.jpg

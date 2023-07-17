@@ -44,6 +44,11 @@ class NumberGuesserHomePage extends StatelessWidget {
         title: "Sixth Generation",
         subTitle: "Only Pokemons from the Kalos region!",
         assetImage: "assets/images/covers/pk_xy.jpg"));
+    widgets.add(DisplayPageItem(
+        navigateTo: const NumberGuesserGamePage(min: kantoStart, max: kalosEnd),
+        title: "Easy Mode",
+        subTitle: "Don't worry you'll find out soon enough!",
+        assetImage: "assets/images/other/pk_wp_3.jpg"));
     return widgets;
   }
 
@@ -88,8 +93,7 @@ class _NumberGuesserGamePageState extends State<NumberGuesserGamePage> {
 
   void _start() {
     _currentLife = 3;
-    _currentPick = _rng.nextInt(widget.max + widget.min - 2) + widget.min;
-    print(_currentPick);
+    _currentPick = _rng.nextInt(widget.max - widget.min) + widget.min;
     _alreadyExtracted.add(_currentPick);
   }
 
