@@ -1,0 +1,13 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="17.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <CustomBuild Include="C:\Users\Kribas\Documents\PokApp\build\windows\CMakeFiles\fd54e31f3e2f8e2bd6b009854d057d08\generate.stamp.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="CMake Rules">
+      <UniqueIdentifier>{D841B5A6-C304-3C91-BA5E-4BCD7919AC6F}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>
