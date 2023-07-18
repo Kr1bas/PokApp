@@ -45,6 +45,22 @@ class NumberGuesserHomePage extends StatelessWidget {
         subTitle: "Only Pokemons from the Kalos region!",
         assetImage: "assets/images/covers/pk_xy.jpg"));
     widgets.add(DisplayPageItem(
+        navigateTo: const NumberGuesserGamePage(min: aloaStart, max: aloaEnd),
+        title: "Seventh Generation",
+        subTitle: "Only Pokemons from the Aloa region!",
+        assetImage: "assets/images/covers/pk_usum.jpg"));
+    widgets.add(DisplayPageItem(
+        navigateTo: const NumberGuesserGamePage(min: galarStart, max: galarEnd),
+        title: "Eighth Generation",
+        subTitle: "Only Pokemons from the Galar/Isui region!",
+        assetImage: "assets/images/covers/pk_ss.jpg"));
+    widgets.add(DisplayPageItem(
+        navigateTo:
+            const NumberGuesserGamePage(min: paldeaStart, max: paldeaEnd),
+        title: "Nineth Generation",
+        subTitle: "Only Pokemons from the Paldea region!",
+        assetImage: "assets/images/covers/pk_sv.jpg"));
+    widgets.add(DisplayPageItem(
         navigateTo: const NumberGuesserGamePage(min: kantoStart, max: kalosEnd),
         title: "Easy Mode",
         subTitle: "Don't worry you'll find out soon enough!",

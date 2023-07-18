@@ -71,6 +71,9 @@ class _GenerationGuesserGamePageState extends State<GenerationGuesserGamePage> {
     if (index <= sinnohEnd) return 4;
     if (index <= unimaEnd) return 5;
     if (index <= kalosEnd) return 6;
+    if (index <= aloaEnd) return 7;
+    if (index <= galarEnd) return 8;
+    if (index <= paldeaEnd) return 9;
     return -1;
   }
 
@@ -84,7 +87,7 @@ class _GenerationGuesserGamePageState extends State<GenerationGuesserGamePage> {
           int.parse(_inputTextController.text), _currentPick)) {
         _currentScore += 1;
         do {
-          _currentPick = _rng.nextInt(kalosEnd) + kantoStart;
+          _currentPick = _rng.nextInt(absoluteEnd) + absoluteStart;
         } while (_alreadyExtracted.contains(_currentPick));
       } else {
         _currentLife -= 1;
@@ -174,6 +177,7 @@ class _GenerationGuesserGamePageState extends State<GenerationGuesserGamePage> {
             Image.asset(
               "assets/images/dex/${_currentPick < 10 ? '00$_currentPick' : (_currentPick < 100 ? '0$_currentPick' : '$_currentPick')}.png",
               fit: BoxFit.contain,
+              height: 350,
             ),
             Form(
               key: _formKey,
@@ -185,7 +189,7 @@ class _GenerationGuesserGamePageState extends State<GenerationGuesserGamePage> {
                       const InputDecoration(hintText: "Insert Generation here"),
                   keyboardType: TextInputType.number,
                   autocorrect: false,
-                  maxLength: 4,
+                  maxLength: 1,
                   maxLengthEnforcement:
                       MaxLengthEnforcement.truncateAfterCompositionEnds,
                   validator: ((value) {
@@ -193,9 +197,9 @@ class _GenerationGuesserGamePageState extends State<GenerationGuesserGamePage> {
                       return 'Please enter a value';
                     }
                     int ival = int.parse(value);
-                    if (ival < 1 || ival > 7) {
+                    if (ival < 1 || ival > 9) {
                       // TODO UPDATE
-                      return 'Value must be between 1 and 7 .';
+                      return 'Value must be between 1 and 9.';
                     }
                     return null;
                   }),
