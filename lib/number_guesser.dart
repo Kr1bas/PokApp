@@ -107,6 +107,14 @@ class _NumberGuesserGamePageState extends State<NumberGuesserGamePage> {
     super.initState();
   }
 
+  void _restart() {
+    for (var n in _alreadyExtracted) {
+      _alreadyExtracted.remove(n);
+    }
+    _currentScore = 0;
+    _start();
+  }
+
   void _start() {
     _currentLife = 3;
     _currentPick = _rng.nextInt(widget.max - widget.min) + widget.min;
@@ -177,7 +185,7 @@ class _NumberGuesserGamePageState extends State<NumberGuesserGamePage> {
               trailing: Text("$_currentScore"),
             ),
             ElevatedButton(
-              onPressed: (() => setState(() => _start())),
+              onPressed: (() => setState(() => _restart())),
               child: const Text("RESTART!"),
             )
           ]),
@@ -208,6 +216,7 @@ class _NumberGuesserGamePageState extends State<NumberGuesserGamePage> {
             Image.asset(
               "assets/images/dex/${_currentPick < 10 ? '00$_currentPick' : (_currentPick < 100 ? '0$_currentPick' : '$_currentPick')}.png",
               fit: BoxFit.contain,
+              height: 350,
             ),
             Form(
               key: _formKey,
