@@ -97,6 +97,7 @@ class _NumberGuesserGamePageState extends State<NumberGuesserGamePage> {
   int _currentScore = 0;
   int _currentPick = -1;
   int _currentLife = -1;
+  bool _endOfGame = false;
   final List<int> _alreadyExtracted = [];
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   final _inputTextController = TextEditingController();
@@ -125,9 +126,14 @@ class _NumberGuesserGamePageState extends State<NumberGuesserGamePage> {
     if (_formKey.currentState!.validate()) {
       if (int.parse(_inputTextController.text) == _currentPick) {
         _currentScore += 1;
-        do {
-          _currentPick = _rng.nextInt(widget.max - 1) + widget.min;
-        } while (_alreadyExtracted.contains(_currentPick));
+        if (_currentScore == (widget.max - widget.min)) {
+          _endOfGame = true;
+        } else {
+          do {
+            _currentPick = _rng.nextInt(widget.max - widget.min) + widget.min;
+          } while (_alreadyExtracted.contains(_currentPick));
+          _alreadyExtracted.add(_currentPick);
+        }
       } else {
         _currentLife -= 1;
         if (_currentLife == 0) {
@@ -180,9 +186,12 @@ class _NumberGuesserGamePageState extends State<NumberGuesserGamePage> {
             borderRadius: BorderRadius.circular(20),
           ),
           child: Column(children: [
-            ListTile(
-              title: const Text("You final score is:"),
-              trailing: Text("$_currentScore"),
+            SizedBox(
+              width: 300,
+              child: ListTile(
+                title: const Text("You final score is:"),
+                trailing: Text("$_currentScore"),
+              ),
             ),
             ElevatedButton(
               onPressed: (() => setState(() => _restart())),

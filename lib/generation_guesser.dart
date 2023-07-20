@@ -1,5 +1,5 @@
-import 'dart:html';
-
+import 'dart:io';
+import 'package:path_provider/path_provider.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -53,6 +53,51 @@ class _GenerationGuesserGamePageState extends State<GenerationGuesserGamePage> {
   final _inputTextController = TextEditingController();
   final Random _rng = Random();
 
+  Future<String> get _localPath async {
+    final directory = await getApplicationDocumentsDirectory();
+    return directory.path;
+  }
+
+  Future<File> get _leaderboardFile async {
+    final path = await _localPath;
+    return File('$path/generationGuesserLeaderboard.csv');
+  }
+
+  Future<List<Widget>> _getCurrentLeaderboard() async {
+    List<Widget> leaderboad = [];
+    File leaderboardFile = await _leaderboardFile;
+    if (!leaderboardFile.existsSync()) {
+      return [];
+    }
+    int i = 1;
+    for (var line in leaderboardFile.readAsLinesSync()) {
+      leaderboad.add(
+        DecoratedBox(
+          decoration: const BoxDecoration(
+            color: Colors.white,
+            boxShadow: [
+              BoxShadow(
+                  color: Colors.grey,
+                  offset: Offset.zero,
+                  blurRadius: 4,
+                  spreadRadius: 2,
+                  blurStyle: BlurStyle.normal)
+            ],
+          ),
+          child: Row(
+            children: [
+              Text('$i'),
+              Text(line.split(',')[0]),
+              Text(line.split(',')[1])
+            ],
+          ),
+        ),
+      );
+      i += 1;
+    }
+    return leaderboad;
+  }
+
   @override
   void initState() {
     super.initState();
@@ -89,11 +134,9 @@ class _GenerationGuesserGamePageState extends State<GenerationGuesserGamePage> {
         do {
           _currentPick = _rng.nextInt(absoluteEnd) + absoluteStart;
         } while (_alreadyExtracted.contains(_currentPick));
+        _alreadyExtracted.add(_currentPick);
       } else {
         _currentLife -= 1;
-        /*if (_currentLife == 0) {
-          _inputTextController.dispose();
-        }*/
       }
       _formKey.currentState!.reset();
     }
@@ -145,6 +188,21 @@ class _GenerationGuesserGamePageState extends State<GenerationGuesserGamePage> {
               title: const Text("You final score is:"),
               trailing: Text("$_currentScore"),
             ),
+            FutureBuilder(
+                future: _getCurrentLeaderboard(),
+                builder: ((context, snapshot) {
+                  if (snapshot.hasError) {
+                    return Text(
+                        'Error retrieving the leaderboard:\n${snapshot.error.toString()}');
+                  }
+                  if (!snapshot.hasData) return const LinearProgressIndicator();
+                  return Padding(
+                    padding: const EdgeInsets.all(10),
+                    child: Column(
+                      children: snapshot.data!,
+                    ),
+                  );
+                })),
             ElevatedButton(
               onPressed: (() => setState(() => _start())),
               child: const Text("RESTART!"),
@@ -198,7 +256,6 @@ class _GenerationGuesserGamePageState extends State<GenerationGuesserGamePage> {
                     }
                     int ival = int.parse(value);
                     if (ival < 1 || ival > 9) {
-                      // TODO UPDATE
                       return 'Value must be between 1 and 9.';
                     }
                     return null;
