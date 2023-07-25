@@ -1,11 +1,12 @@
 import 'dart:io';
-import 'package:path_provider/path_provider.dart';
+//import 'package:path_provider/path_provider.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:pokapp/constants.dart';
 import 'package:pokapp/parallax_scrolling.dart';
 import 'dart:math';
+import 'package:pokapp/leaderbords.dart';
 
 class GenerationGuesserHomePage extends StatelessWidget {
   const GenerationGuesserHomePage({super.key});
@@ -53,7 +54,7 @@ class _GenerationGuesserGamePageState extends State<GenerationGuesserGamePage> {
   final _inputTextController = TextEditingController();
   final Random _rng = Random();
 
-  Future<String> get _localPath async {
+  /* Future<String> get _localPath async {
     final directory = await getApplicationDocumentsDirectory();
     return directory.path;
   }
@@ -96,14 +97,32 @@ class _GenerationGuesserGamePageState extends State<GenerationGuesserGamePage> {
       i += 1;
     }
     return leaderboad;
-  }
+  } */
 
   @override
   void initState() {
     super.initState();
   }
 
-  void _start() {
+  void _start() async {
+    //TEST
+    try {
+      final lbh = LeaderBoardsHandler();
+      var ok = await lbh.init(
+        db: const String.fromEnvironment('DB_DB'),
+        host: const String.fromEnvironment('DB_HOST'),
+        user: const String.fromEnvironment('DB_USER'),
+        password: const String.fromEnvironment('DB_PWD'),
+        port: int.parse(const String.fromEnvironment('DB_PORT')),
+      );
+      print(ok);
+      lbh.testConnection();
+    } catch (e) {
+      print(e.toString());
+    }
+
+    //ENDTEST
+
     _currentLife = 3;
     _currentPick = _rng.nextInt(kalosEnd) + kantoStart;
     _alreadyExtracted.add(_currentPick);
@@ -188,7 +207,7 @@ class _GenerationGuesserGamePageState extends State<GenerationGuesserGamePage> {
               title: const Text("You final score is:"),
               trailing: Text("$_currentScore"),
             ),
-            FutureBuilder(
+            /* FutureBuilder(
                 future: _getCurrentLeaderboard(),
                 builder: ((context, snapshot) {
                   if (snapshot.hasError) {
@@ -202,7 +221,7 @@ class _GenerationGuesserGamePageState extends State<GenerationGuesserGamePage> {
                       children: snapshot.data!,
                     ),
                   );
-                })),
+                })), */
             ElevatedButton(
               onPressed: (() => setState(() => _start())),
               child: const Text("RESTART!"),

@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:pokapp/generation_guesser.dart';
+import 'package:pokapp/leaderbords.dart';
 import 'package:pokapp/parallax_scrolling.dart';
 import 'package:pokapp/number_guesser.dart';
 
 void main() {
+  
   runApp(const MyApp());
 }
 
@@ -35,7 +37,7 @@ class MyHomePage extends StatelessWidget {
       assetImage: "assets/images/other/pkdex_guess.png",
     ));
     widgets.add(DisplayPageItem(
-      navigateTo: const GenerationGuesserGamePage(),
+      navigateTo: const GenerationGuesserHomePage(),
       title: "Generation Guesser",
       subTitle: "Guess from which generation the pokemon is.",
       assetImage: "assets/images/other/pkdex.png",
