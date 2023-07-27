@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:mysql_manager/src/mysql_manager.dart';
 
 class LeaderBoardsHandler {
@@ -15,6 +17,7 @@ class LeaderBoardsHandler {
       required String password,
       required int port}) async {
     print("INIT");
+    print('$db - $host - $user - $password - $port');
     connection = await manager.init(false, {
       'db': db,
       'host': host,

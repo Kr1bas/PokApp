@@ -113,7 +113,7 @@ class _GenerationGuesserGamePageState extends State<GenerationGuesserGamePage> {
         host: const String.fromEnvironment('DB_HOST'),
         user: const String.fromEnvironment('DB_USER'),
         password: const String.fromEnvironment('DB_PWD'),
-        port: int.parse(const String.fromEnvironment('DB_PORT')),
+        port: const int.fromEnvironment('DB_PORT'),
       );
       print(ok);
       lbh.testConnection();
