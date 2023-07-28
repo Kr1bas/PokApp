@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "685887848325",
+    "project_id": "pokapp-web",
+    "storage_bucket": "pokapp-web.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:685887848325:android:946ef75f7c777b36dd0eec",
+        "android_client_info": {
+          "package_name": "com.example.pokapp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "685887848325-34a9pgm1n8ms6ekv24llqk32kgap69ni.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDtN3hsAI_YNJSEZ90PyMs8sgXj8yzDvCk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "685887848325-34a9pgm1n8ms6ekv24llqk32kgap69ni.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

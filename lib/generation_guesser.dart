@@ -6,15 +6,19 @@ import 'package:flutter/services.dart';
 import 'package:pokapp/constants.dart';
 import 'package:pokapp/parallax_scrolling.dart';
 import 'dart:math';
-import 'package:pokapp/leaderbords.dart';
+import 'package:pokapp/leaderbord.dart';
 
 class GenerationGuesserHomePage extends StatelessWidget {
-  const GenerationGuesserHomePage({super.key});
+  const GenerationGuesserHomePage({super.key, required this.gameID});
+  final String gameID;
 
   List<DisplayPageItem> getGenerationGuesserPageList() {
     final widgets = <DisplayPageItem>[];
     widgets.add(DisplayPageItem(
-      navigateTo: const GenerationGuesserGamePage(),
+      navigateTo: GenerationGuesserGamePage(
+        categoryID: 'all',
+        gameID: gameID,
+      ),
       title: "Every Generation!",
       subTitle: "Only every pokemon ever made!",
       assetImage: "assets/images/other/pk_wp_3.jpg",
@@ -38,8 +42,10 @@ class GenerationGuesserHomePage extends StatelessWidget {
 }
 
 class GenerationGuesserGamePage extends StatefulWidget {
-  const GenerationGuesserGamePage({super.key});
-
+  const GenerationGuesserGamePage(
+      {super.key, required this.gameID, required this.categoryID});
+  final String gameID;
+  final String categoryID;
   @override
   State<GenerationGuesserGamePage> createState() =>
       _GenerationGuesserGamePageState();
@@ -54,51 +60,6 @@ class _GenerationGuesserGamePageState extends State<GenerationGuesserGamePage> {
   final _inputTextController = TextEditingController();
   final Random _rng = Random();
 
-  /* Future<String> get _localPath async {
-    final directory = await getApplicationDocumentsDirectory();
-    return directory.path;
-  }
-
-  Future<File> get _leaderboardFile async {
-    final path = await _localPath;
-    return File('$path/generationGuesserLeaderboard.csv');
-  }
-
-  Future<List<Widget>> _getCurrentLeaderboard() async {
-    List<Widget> leaderboad = [];
-    File leaderboardFile = await _leaderboardFile;
-    if (!leaderboardFile.existsSync()) {
-      return [];
-    }
-    int i = 1;
-    for (var line in leaderboardFile.readAsLinesSync()) {
-      leaderboad.add(
-        DecoratedBox(
-          decoration: const BoxDecoration(
-            color: Colors.white,
-            boxShadow: [
-              BoxShadow(
-                  color: Colors.grey,
-                  offset: Offset.zero,
-                  blurRadius: 4,
-                  spreadRadius: 2,
-                  blurStyle: BlurStyle.normal)
-            ],
-          ),
-          child: Row(
-            children: [
-              Text('$i'),
-              Text(line.split(',')[0]),
-              Text(line.split(',')[1])
-            ],
-          ),
-        ),
-      );
-      i += 1;
-    }
-    return leaderboad;
-  } */
-
   @override
   void initState() {
     super.initState();
@@ -107,16 +68,11 @@ class _GenerationGuesserGamePageState extends State<GenerationGuesserGamePage> {
   void _start() async {
     //TEST
     try {
-      final lbh = LeaderBoardsHandler();
-      var ok = await lbh.init(
-        db: const String.fromEnvironment('DB_DB'),
-        host: const String.fromEnvironment('DB_HOST'),
-        user: const String.fromEnvironment('DB_USER'),
-        password: const String.fromEnvironment('DB_PWD'),
-        port: const int.fromEnvironment('DB_PORT'),
+      final ldb = await Leaderboard.getLeaderboard(
+        game: widget.gameID,
+        category: widget.categoryID,
       );
-      print(ok);
-      lbh.testConnection();
+      print(ldb.toString());
     } catch (e) {
       print(e.toString());
     }
@@ -126,6 +82,7 @@ class _GenerationGuesserGamePageState extends State<GenerationGuesserGamePage> {
     _currentLife = 3;
     _currentPick = _rng.nextInt(kalosEnd) + kantoStart;
     _alreadyExtracted.add(_currentPick);
+    setState(() {});
   }
 
   int _generation(int index) {
@@ -133,9 +90,9 @@ class _GenerationGuesserGamePageState extends State<GenerationGuesserGamePage> {
     if (index <= jhotoEnd) return 2;
     if (index <= hoennEnd) return 3;
     if (index <= sinnohEnd) return 4;
-    if (index <= unimaEnd) return 5;
+    if (index <= unovaEnd) return 5;
     if (index <= kalosEnd) return 6;
-    if (index <= aloaEnd) return 7;
+    if (index <= alolaEnd) return 7;
     if (index <= galarEnd) return 8;
     if (index <= paldeaEnd) return 9;
     return -1;
@@ -161,6 +118,15 @@ class _GenerationGuesserGamePageState extends State<GenerationGuesserGamePage> {
     }
   }
 
+  void _restart() {
+    setState(() {
+      _formKey.currentState!.reset();
+      _currentLife = 3;
+      _alreadyExtracted.removeWhere((e) => true);
+      _currentPick = -1;
+    });
+  }
+
   List<Widget> _getCurrentLifeIcons() {
     List<Widget> icons = [];
     for (var i = 0; i < _currentLife; i++) {
@@ -183,7 +149,7 @@ class _GenerationGuesserGamePageState extends State<GenerationGuesserGamePage> {
     Widget child;
     if (_currentPick == -1) {
       child = ElevatedButton(
-        onPressed: (() => setState(() => _start())),
+        onPressed: (() => _start()),
         child: const Text("START!"),
       );
     } else if (_currentLife == 0) {
@@ -223,7 +189,7 @@ class _GenerationGuesserGamePageState extends State<GenerationGuesserGamePage> {
                   );
                 })), */
             ElevatedButton(
-              onPressed: (() => setState(() => _start())),
+              onPressed: (() => _restart()),
               child: const Text("RESTART!"),
             )
           ]),

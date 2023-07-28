@@ -35,7 +35,7 @@ class NumberGuesserHomePage extends StatelessWidget {
         subTitle: "Only Pokemons from the Sinnoh region!",
         assetImage: "assets/images/covers/pk_dp.jpg"));
     widgets.add(DisplayPageItem(
-        navigateTo: const NumberGuesserGamePage(min: unimaStart, max: unimaEnd),
+        navigateTo: const NumberGuesserGamePage(min: unovaStart, max: unovaEnd),
         title: "Fifth Generation",
         subTitle: "Only Pokemons from the Unima/Unova region!",
         assetImage: "assets/images/covers/pk_bw.jpg"));
@@ -45,7 +45,7 @@ class NumberGuesserHomePage extends StatelessWidget {
         subTitle: "Only Pokemons from the Kalos region!",
         assetImage: "assets/images/covers/pk_xy.jpg"));
     widgets.add(DisplayPageItem(
-        navigateTo: const NumberGuesserGamePage(min: aloaStart, max: aloaEnd),
+        navigateTo: const NumberGuesserGamePage(min: alolaStart, max: alolaEnd),
         title: "Seventh Generation",
         subTitle: "Only Pokemons from the Aloa region!",
         assetImage: "assets/images/covers/pk_usum.jpg"));
