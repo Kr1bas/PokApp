@@ -1,5 +1,3 @@
-import 'dart:io';
-//import 'package:path_provider/path_provider.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -120,6 +118,7 @@ class _GenerationGuesserGamePageState extends State<GenerationGuesserGamePage> {
 
   void _restart() {
     setState(() {
+      // TODO finish
       _formKey.currentState!.reset();
       _currentLife = 3;
       _alreadyExtracted.removeWhere((e) => true);
@@ -196,62 +195,71 @@ class _GenerationGuesserGamePageState extends State<GenerationGuesserGamePage> {
         ),
       );
     } else {
-      child = Padding(
-        padding: const EdgeInsets.fromLTRB(10, 100, 10, 100),
-        child: DecoratedBox(
-          decoration: BoxDecoration(
-            color: Colors.white,
-            boxShadow: const [
-              BoxShadow(
-                  color: Colors.grey,
-                  offset: Offset.zero,
-                  blurRadius: 4,
-                  spreadRadius: 2,
-                  blurStyle: BlurStyle.normal)
-            ],
-            borderRadius: BorderRadius.circular(20),
-          ),
-          child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-            Text("Current Score: $_currentScore"),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: _getCurrentLifeIcons(),
+      child = AspectRatio(
+        aspectRatio: 3 / 4,
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(10, 10, 10, 10),
+          child: DecoratedBox(
+            decoration: BoxDecoration(
+              color: Colors.white,
+              boxShadow: const [
+                BoxShadow(
+                    color: Colors.grey,
+                    offset: Offset.zero,
+                    blurRadius: 4,
+                    spreadRadius: 2,
+                    blurStyle: BlurStyle.normal)
+              ],
+              borderRadius: BorderRadius.circular(20),
             ),
-            Image.asset(
-              "assets/images/dex/${_currentPick < 10 ? '00$_currentPick' : (_currentPick < 100 ? '0$_currentPick' : '$_currentPick')}.png",
-              fit: BoxFit.contain,
-              height: 350,
-            ),
-            Form(
-              key: _formKey,
-              child: SizedBox(
-                width: 250,
-                child: TextFormField(
-                  controller: _inputTextController,
-                  decoration:
-                      const InputDecoration(hintText: "Insert Generation here"),
-                  keyboardType: TextInputType.number,
-                  autocorrect: false,
-                  maxLength: 1,
-                  maxLengthEnforcement:
-                      MaxLengthEnforcement.truncateAfterCompositionEnds,
-                  validator: ((value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Please enter a value';
-                    }
-                    int ival = int.parse(value);
-                    if (ival < 1 || ival > 9) {
-                      return 'Value must be between 1 and 9.';
-                    }
-                    return null;
-                  }),
+            child:
+                Column(mainAxisAlignment: MainAxisAlignment.center, children: [
+              Text(
+                "Current Score: $_currentScore",
+                style: Theme.of(context).textTheme.headlineSmall,
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: _getCurrentLifeIcons(),
+              ),
+              AspectRatio(
+                aspectRatio: 4 / 3,
+                child: Image.asset(
+                  "assets/images/dex/${_currentPick < 10 ? '00$_currentPick' : (_currentPick < 100 ? '0$_currentPick' : '$_currentPick')}.png",
+                  fit: BoxFit.contain,
                 ),
               ),
-            ),
-            ElevatedButton(
-                onPressed: () => setState(() => _next()),
-                child: const Text("Next!")),
-          ]),
+              Form(
+                key: _formKey,
+                child: SizedBox(
+                  width: 250,
+                  child: TextFormField(
+                    controller: _inputTextController,
+                    decoration: const InputDecoration(
+                        hintText: "Insert Generation here"),
+                    keyboardType: TextInputType.number,
+                    autocorrect: false,
+                    maxLength: 1,
+                    maxLengthEnforcement:
+                        MaxLengthEnforcement.truncateAfterCompositionEnds,
+                    validator: ((value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Please enter a value';
+                      }
+                      int ival = int.parse(value);
+                      if (ival < 1 || ival > 9) {
+                        return 'Value must be between 1 and 9.';
+                      }
+                      return null;
+                    }),
+                  ),
+                ),
+              ),
+              ElevatedButton(
+                  onPressed: () => setState(() => _next()),
+                  child: const Text("Next!")),
+            ]),
+          ),
         ),
       );
     }
