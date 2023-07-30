@@ -59,6 +59,7 @@ abstract class GameCategoryPageState<T extends GameCategoryPage>
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   final _inputTextController = TextEditingController();
   final Random _rng = Random();
+  late final Function isCorrectAnswer;
 
   @override
   void initState() {
@@ -84,11 +85,11 @@ abstract class GameCategoryPageState<T extends GameCategoryPage>
     setState(() {});
   }
 
-  bool _isCorrectAnswer({required String answer, required int currentPick});
+  //bool _isCorrectAnswer({required String answer, required int currentPick});
 
   void _next() {
     if (_formKey.currentState!.validate()) {
-      if (_isCorrectAnswer(
+      if (isCorrectAnswer(
           answer: _inputTextController.text, currentPick: _currentPick)) {
         _currentScore += 1;
         do {
@@ -104,12 +105,12 @@ abstract class GameCategoryPageState<T extends GameCategoryPage>
   }
 
   void _restart() {
+    _formKey.currentState!.reset();
+    _currentLife = widget.maxLives;
+    _alreadyExtracted.removeWhere((e) => true);
+    _currentPick = -1;
     setState(() {
       // TODO finish
-      _formKey.currentState!.reset();
-      _currentLife = widget.maxLives;
-      _alreadyExtracted.removeWhere((e) => true);
-      _currentPick = -1;
     });
   }
 
@@ -175,7 +176,7 @@ abstract class GameCategoryPageState<T extends GameCategoryPage>
                   );
                 })), */
             ElevatedButton(
-              onPressed: (() => _restart()),
+              onPressed: (() => this._restart()),
               child: const Text("RESTART!"),
             )
           ]),

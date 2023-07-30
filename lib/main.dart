@@ -42,7 +42,10 @@ class MyHomePage extends StatelessWidget {
       assetImage: "assets/images/other/pkdex_guess.png",
     ));
     widgets.add(DisplayPageItem(
-      navigateTo: const GenerationGuesserHomePage(gameID: generationGuesserID),
+      navigateTo: const GenerationGuesserHomePage(
+        gameID: generationGuesserID,
+        title: "PokAPP Generation Guesser",
+      ),
       title: "Generation Guesser",
       subTitle: "Guess from which generation the pokemon is.",
       assetImage: "assets/images/other/pkdex.png",
