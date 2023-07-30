@@ -36,7 +36,8 @@ class MyHomePage extends StatelessWidget {
   List<DisplayPageItem> getHomePageList() {
     final widgets = <DisplayPageItem>[];
     widgets.add(DisplayPageItem(
-      navigateTo: const NumberGuesserHomePage(),
+      navigateTo: NumberGuesserHomePage(
+          gameID: numberGuesserID, title: "PokAPP Number Guesser"),
       title: "Number Guesser",
       subTitle: "Guess the pokedex number",
       assetImage: "assets/images/other/pkdex_guess.png",

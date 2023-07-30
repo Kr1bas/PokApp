@@ -2,6 +2,9 @@ import 'package:pokapp/main.dart';
 
 // DB constants
 const String generationGuesserID = 'generationGuesser';
+const String numberGuesserID = 'numberGuesser';
+// Various constants
+const int maxLives = 3;
 
 // Regional pokedex indexes
 const int absoluteStart = 1;

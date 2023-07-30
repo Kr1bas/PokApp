@@ -1,92 +1,91 @@
+import 'package:pokapp/constants.dart';
 import 'dart:html';
-
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:pokapp/constants.dart';
+import 'package:pokapp/game_page_interface.dart';
 import 'package:pokapp/parallax_scrolling.dart';
 import 'dart:math';
 
-class NumberGuesserHomePage extends StatelessWidget {
-  const NumberGuesserHomePage({super.key});
+const int maxLives = 3;
 
-  List<DisplayPageItem> getNumberGuesserPageList() {
+class NumberGuesserHomePage extends GameHomePage {
+  const NumberGuesserHomePage(
+      {super.key, required super.gameID, required super.title});
+
+  @override
+  List<DisplayPageItem> getGamePageList() {
     final widgets = <DisplayPageItem>[];
     widgets.add(DisplayPageItem(
-      navigateTo: const NumberGuesserGamePage(min: kantoStart, max: kantoEnd),
+      navigateTo:
+          NumberGuesserGamePage(min: kantoStart, max: kantoEnd, title: title),
       title: "First Generation",
       subTitle: "Only the original 151!",
       assetImage: "assets/images/covers/pk_frlg.jpg",
     ));
     widgets.add(DisplayPageItem(
-        navigateTo: const NumberGuesserGamePage(min: jhotoStart, max: jhotoEnd),
+        navigateTo:
+            NumberGuesserGamePage(min: jhotoStart, max: jhotoEnd, title: title),
         title: "Second Generation",
         subTitle: "Only Pokemons from the Jhoto region!",
         assetImage: "assets/images/covers/pk_hgss.jpg"));
     widgets.add(DisplayPageItem(
-        navigateTo: const NumberGuesserGamePage(min: hoennStart, max: hoennEnd),
+        navigateTo:
+            NumberGuesserGamePage(min: hoennStart, max: hoennEnd, title: title),
         title: "Third Generation",
         subTitle: "Only Pokemons from the Hoenn region!",
         assetImage: "assets/images/covers/pk_rs.jpg"));
     widgets.add(DisplayPageItem(
-        navigateTo:
-            const NumberGuesserGamePage(min: sinnohStart, max: sinnohEnd),
+        navigateTo: NumberGuesserGamePage(
+            min: sinnohStart, max: sinnohEnd, title: title),
         title: "Fourth Generation",
         subTitle: "Only Pokemons from the Sinnoh region!",
         assetImage: "assets/images/covers/pk_dp.jpg"));
     widgets.add(DisplayPageItem(
-        navigateTo: const NumberGuesserGamePage(min: unovaStart, max: unovaEnd),
+        navigateTo:
+            NumberGuesserGamePage(min: unovaStart, max: unovaEnd, title: title),
         title: "Fifth Generation",
         subTitle: "Only Pokemons from the Unima/Unova region!",
         assetImage: "assets/images/covers/pk_bw.jpg"));
     widgets.add(DisplayPageItem(
-        navigateTo: const NumberGuesserGamePage(min: kalosStart, max: kalosEnd),
+        navigateTo:
+            NumberGuesserGamePage(min: kalosStart, max: kalosEnd, title: title),
         title: "Sixth Generation",
         subTitle: "Only Pokemons from the Kalos region!",
         assetImage: "assets/images/covers/pk_xy.jpg"));
     widgets.add(DisplayPageItem(
-        navigateTo: const NumberGuesserGamePage(min: alolaStart, max: alolaEnd),
+        navigateTo:
+            NumberGuesserGamePage(min: alolaStart, max: alolaEnd, title: title),
         title: "Seventh Generation",
-        subTitle: "Only Pokemons from the Aloa region!",
+        subTitle: "Only Pokemons from the Alola region!",
         assetImage: "assets/images/covers/pk_usum.jpg"));
     widgets.add(DisplayPageItem(
-        navigateTo: const NumberGuesserGamePage(min: galarStart, max: galarEnd),
+        navigateTo:
+            NumberGuesserGamePage(min: galarStart, max: galarEnd, title: title),
         title: "Eighth Generation",
         subTitle: "Only Pokemons from the Galar/Isui region!",
         assetImage: "assets/images/covers/pk_ss.jpg"));
     widgets.add(DisplayPageItem(
-        navigateTo:
-            const NumberGuesserGamePage(min: paldeaStart, max: paldeaEnd),
+        navigateTo: NumberGuesserGamePage(
+            min: paldeaStart, max: paldeaEnd, title: title),
         title: "Nineth Generation",
         subTitle: "Only Pokemons from the Paldea region!",
         assetImage: "assets/images/covers/pk_sv.jpg"));
     widgets.add(DisplayPageItem(
-        navigateTo: const NumberGuesserGamePage(min: kantoStart, max: kalosEnd),
+        navigateTo: NumberGuesserGamePage(
+            min: absoluteStart, max: absoluteEnd, title: title),
         title: "Easy Mode",
         subTitle: "Don't worry you'll find out soon enough!",
         assetImage: "assets/images/other/pk_wp_3.jpg"));
     return widgets;
   }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text("PokAPP Number Guess"),
-      ),
-      body: Center(
-        child: SafeArea(
-          child: ListView(children: getNumberGuesserPageList()),
-        ),
-      ),
-    );
-  }
 }
 
 class NumberGuesserGamePage extends StatefulWidget {
   const NumberGuesserGamePage(
-      {super.key, required this.max, required this.min});
+      {super.key, required this.max, required this.min, required this.title});
 
+  final String title;
   final int max;
   final int min;
   @override
@@ -103,15 +102,8 @@ class _NumberGuesserGamePageState extends State<NumberGuesserGamePage> {
   final _inputTextController = TextEditingController();
   final Random _rng = Random();
 
-  @override
-  void initState() {
-    super.initState();
-  }
-
   void _restart() {
-    for (var n in _alreadyExtracted) {
-      _alreadyExtracted.remove(n);
-    }
+    _alreadyExtracted.removeWhere((element) => true);
     _currentScore = 0;
     _start();
   }
@@ -152,7 +144,7 @@ class _NumberGuesserGamePageState extends State<NumberGuesserGamePage> {
         color: Colors.red,
       ));
     }
-    for (var i = 0; i < (3 - _currentLife); i++) {
+    for (var i = 0; i < (maxLives - _currentLife); i++) {
       icons.add(const Icon(
         Icons.heart_broken,
         color: Colors.black12,
@@ -165,67 +157,45 @@ class _NumberGuesserGamePageState extends State<NumberGuesserGamePage> {
   Widget build(BuildContext context) {
     Widget child;
     if (_currentPick == -1) {
-      child = ElevatedButton(
-        onPressed: (() => setState(() => _start())),
-        child: const Text("START!"),
-      );
-    } else if (_currentLife == 0) {
-      child = Padding(
-        padding: const EdgeInsets.fromLTRB(10, 100, 10, 100),
-        child: DecoratedBox(
-          decoration: BoxDecoration(
-            color: Colors.white,
-            boxShadow: const [
-              BoxShadow(
-                  color: Colors.grey,
-                  offset: Offset.zero,
-                  blurRadius: 4,
-                  spreadRadius: 2,
-                  blurStyle: BlurStyle.normal)
-            ],
-            borderRadius: BorderRadius.circular(20),
-          ),
-          child: Column(children: [
-            SizedBox(
-              width: 300,
-              child: ListTile(
-                title: const Text("You final score is:"),
-                trailing: Text("$_currentScore"),
-              ),
-            ),
-            ElevatedButton(
-              onPressed: (() => setState(() => _restart())),
-              child: const Text("RESTART!"),
-            )
-          ]),
+      child = Center(
+        child: ElevatedButton(
+          onPressed: (() => setState(() => _start())),
+          child: const Text("START!"),
         ),
       );
-    } else {
-      child = Padding(
-        padding: const EdgeInsets.fromLTRB(10, 100, 10, 100),
-        child: DecoratedBox(
-          decoration: BoxDecoration(
-            color: Colors.white,
-            boxShadow: const [
-              BoxShadow(
-                  color: Colors.grey,
-                  offset: Offset.zero,
-                  blurRadius: 4,
-                  spreadRadius: 2,
-                  blurStyle: BlurStyle.normal)
-            ],
-            borderRadius: BorderRadius.circular(20),
+    } else if (_currentLife == 0) {
+      child = Column(children: [
+        SizedBox(
+          width: 300,
+          child: ListTile(
+            title: const Text("You final score is:"),
+            trailing: Text("$_currentScore"),
           ),
-          child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-            Text("Current Score: $_currentScore"),
+        ),
+        ElevatedButton(
+          onPressed: (() => setState(() => _restart())),
+          child: const Text("RESTART!"),
+        )
+      ]);
+    } else {
+      child = child = Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          textBaseline: TextBaseline.alphabetic,
+          children: [
+            Text(
+              "Current Score: $_currentScore",
+              style: Theme.of(context).textTheme.headlineSmall,
+            ),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: _getCurrentLifeIcons(),
             ),
-            Image.asset(
-              "assets/images/dex/${_currentPick < 10 ? '00$_currentPick' : (_currentPick < 100 ? '0$_currentPick' : '$_currentPick')}.png",
-              fit: BoxFit.contain,
-              height: 350,
+            AspectRatio(
+              aspectRatio: 4 / 3,
+              child: Image.asset(
+                "assets/images/dex/${_currentPick < 10 ? '00$_currentPick' : (_currentPick < 100 ? '0$_currentPick' : '$_currentPick')}.png",
+                fit: BoxFit.contain,
+              ),
             ),
             Form(
               key: _formKey,
@@ -233,8 +203,8 @@ class _NumberGuesserGamePageState extends State<NumberGuesserGamePage> {
                 width: 250,
                 child: TextFormField(
                   controller: _inputTextController,
-                  decoration:
-                      const InputDecoration(hintText: "Insert number here"),
+                  decoration: const InputDecoration(
+                      hintText: "Insert Pokedex number here"),
                   keyboardType: TextInputType.number,
                   autocorrect: false,
                   maxLength: 4,
@@ -256,24 +226,8 @@ class _NumberGuesserGamePageState extends State<NumberGuesserGamePage> {
             ElevatedButton(
                 onPressed: () => setState(() => _next()),
                 child: const Text("Next!")),
-          ]),
-        ),
-      );
+          ]);
     }
-    return Stack(
-      children: <Widget>[
-        Image.asset("assets/images/other/pk_wp_2.jpg",
-            width: MediaQuery.of(context).size.width,
-            height: MediaQuery.of(context).size.height,
-            fit: BoxFit.cover),
-        Scaffold(
-          backgroundColor: Colors.transparent,
-          appBar: AppBar(
-            title: const Text("PokAPP"),
-          ),
-          body: Center(child: child),
-        )
-      ],
-    );
+    return GamePageScaffold(title: widget.title, child: child);
   }
 }

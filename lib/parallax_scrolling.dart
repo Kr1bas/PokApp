@@ -84,7 +84,9 @@ class DisplayPageItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 96, vertical: 32),
+      padding: EdgeInsets.symmetric(
+          horizontal: (MediaQuery.of(context).size.width / 9),
+          vertical: (MediaQuery.of(context).size.height / 50)),
       child: AspectRatio(
         aspectRatio: 16 / 9,
         child: ClipRRect(

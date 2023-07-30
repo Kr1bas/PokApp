@@ -64,11 +64,6 @@ class _GenerationGuesserGamePageState extends State<GenerationGuesserGamePage> {
   final _inputTextController = TextEditingController();
   final Random _rng = Random();
 
-  @override
-  void initState() {
-    super.initState();
-  }
-
   int _generation(int index) {
     if (index <= kantoEnd) return 1;
     if (index <= jhotoEnd) return 2;
@@ -123,7 +118,7 @@ class _GenerationGuesserGamePageState extends State<GenerationGuesserGamePage> {
   }
 
   void _restart() {
-    _formKey.currentState!.reset();
+    _formKey.currentState?.reset();
 
     _currentLife = widget.maxLives;
     _alreadyExtracted.removeWhere((e) => true);
@@ -154,32 +149,19 @@ class _GenerationGuesserGamePageState extends State<GenerationGuesserGamePage> {
   Widget build(BuildContext context) {
     Widget child;
     if (_currentPick == -1) {
-      child = ElevatedButton(
-        onPressed: (() => _start()),
-        child: const Text("START!"),
+      child = Center(
+        child: ElevatedButton(
+          onPressed: (() => _start()),
+          child: const Text("START!"),
+        ),
       );
     } else if (_currentLife == 0) {
-      child = Padding(
-        padding: const EdgeInsets.fromLTRB(10, 100, 10, 100),
-        child: DecoratedBox(
-          decoration: BoxDecoration(
-            color: Colors.white,
-            boxShadow: const [
-              BoxShadow(
-                  color: Colors.grey,
-                  offset: Offset.zero,
-                  blurRadius: 4,
-                  spreadRadius: 2,
-                  blurStyle: BlurStyle.normal)
-            ],
-            borderRadius: BorderRadius.circular(20),
-          ),
-          child: Column(children: [
-            ListTile(
-              title: const Text("You final score is:"),
-              trailing: Text("$_currentScore"),
-            ),
-            /* FutureBuilder(
+      child = Column(children: [
+        ListTile(
+          title: const Text("You final score is:"),
+          trailing: Text("$_currentScore"),
+        ),
+        /* FutureBuilder(
                 future: _getCurrentLeaderboard(),
                 builder: ((context, snapshot) {
                   if (snapshot.hasError) {
@@ -194,96 +176,62 @@ class _GenerationGuesserGamePageState extends State<GenerationGuesserGamePage> {
                     ),
                   );
                 })), */
-            ElevatedButton(
-              onPressed: (() => _restart()),
-              child: const Text("RESTART!"),
-            )
-          ]),
-        ),
-      );
-    } else {
-      child = AspectRatio(
-        aspectRatio: 3 / 4,
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(10, 10, 10, 10),
-          child: DecoratedBox(
-            decoration: BoxDecoration(
-              color: Colors.white,
-              boxShadow: const [
-                BoxShadow(
-                    color: Colors.grey,
-                    offset: Offset.zero,
-                    blurRadius: 4,
-                    spreadRadius: 2,
-                    blurStyle: BlurStyle.normal)
-              ],
-              borderRadius: BorderRadius.circular(20),
-            ),
-            child:
-                Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-              Text(
-                "Current Score: $_currentScore",
-                style: Theme.of(context).textTheme.headlineSmall,
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: _getCurrentLifeIcons(),
-              ),
-              AspectRatio(
-                aspectRatio: 4 / 3,
-                child: Image.asset(
-                  "assets/images/dex/${_currentPick < 10 ? '00$_currentPick' : (_currentPick < 100 ? '0$_currentPick' : '$_currentPick')}.png",
-                  fit: BoxFit.contain,
-                ),
-              ),
-              Form(
-                key: _formKey,
-                child: SizedBox(
-                  width: 250,
-                  child: TextFormField(
-                    controller: _inputTextController,
-                    decoration: const InputDecoration(
-                        hintText: "Insert Generation here"),
-                    keyboardType: TextInputType.number,
-                    autocorrect: false,
-                    maxLength: widget.inputMaxLength,
-                    maxLengthEnforcement:
-                        MaxLengthEnforcement.truncateAfterCompositionEnds,
-                    validator: ((value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Please enter a value';
-                      }
-                      int ival = int.parse(value);
-                      if (ival < 1 || ival > 9) {
-                        return 'Value must be between 1 and 9.';
-                      }
-                      return null;
-                    }),
-                  ),
-                ),
-              ),
-              ElevatedButton(
-                  onPressed: () => setState(() => _next()),
-                  child: const Text("Next!")),
-            ]),
-          ),
-        ),
-      );
-    }
-    return Stack(
-      children: <Widget>[
-        Image.asset("assets/images/other/pk_wp_2.jpg",
-            width: MediaQuery.of(context).size.width,
-            height: MediaQuery.of(context).size.height,
-            fit: BoxFit.cover),
-        Scaffold(
-          backgroundColor: Colors.transparent,
-          appBar: AppBar(
-            title: Text(widget.title),
-          ),
-          body: Center(child: child),
+        ElevatedButton(
+          onPressed: (() => _restart()),
+          child: const Text("RESTART!"),
         )
-      ],
-    );
+      ]);
+    } else {
+      child = Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          textBaseline: TextBaseline.alphabetic,
+          children: [
+            Text(
+              "Current Score: $_currentScore",
+              style: Theme.of(context).textTheme.headlineSmall,
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: _getCurrentLifeIcons(),
+            ),
+            AspectRatio(
+              aspectRatio: 4 / 3,
+              child: Image.asset(
+                "assets/images/dex/${_currentPick < 10 ? '00$_currentPick' : (_currentPick < 100 ? '0$_currentPick' : '$_currentPick')}.png",
+                fit: BoxFit.contain,
+              ),
+            ),
+            Form(
+              key: _formKey,
+              child: SizedBox(
+                width: 250,
+                child: TextFormField(
+                  controller: _inputTextController,
+                  decoration:
+                      const InputDecoration(hintText: "Insert Generation here"),
+                  keyboardType: TextInputType.number,
+                  autocorrect: false,
+                  maxLength: widget.inputMaxLength,
+                  maxLengthEnforcement:
+                      MaxLengthEnforcement.truncateAfterCompositionEnds,
+                  validator: ((value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Please enter a value';
+                    }
+                    int ival = int.parse(value);
+                    if (ival < 1 || ival > 9) {
+                      return 'Value must be between 1 and 9.';
+                    }
+                    return null;
+                  }),
+                ),
+              ),
+            ),
+            ElevatedButton(
+                onPressed: () => setState(() => _next()),
+                child: const Text("Next!")),
+          ]);
+    }
+    return GamePageScaffold(title: widget.title, child: child);
   }
 }
