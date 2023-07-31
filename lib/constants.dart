@@ -1,29 +1,64 @@
+import 'package:flutter/material.dart';
 import 'package:pokapp/main.dart';
 
-// DB constants
-const String generationGuesserID = 'generationGuesser';
-const String numberGuesserID = 'numberGuesser';
-// Various constants
-const int maxLives = 3;
+class Costants {
+  // Various constants
+  static const int maxLives = 3;
+  // DB constants
+  static const String generationGuesserID = 'generationGuesser';
+  static const String numberGuesserID = 'numberGuesser';
+  static const String categoryAll = 'all';
+  static const String categoryShadow = 'shadow';
+  // Regional pokedex indexes
+  static const int absoluteStart = 1;
+  static const int absoluteEnd = 1010;
+  static const int kantoStart = 1;
+  static const int kantoEnd = 151;
+  static const int jhotoStart = 152;
+  static const int jhotoEnd = 251;
+  static const int hoennStart = 252;
+  static const int hoennEnd = 386;
+  static const int sinnohStart = 387;
+  static const int sinnohEnd = 493;
+  static const int unovaStart = 494;
+  static const int unovaEnd = 649;
+  static const int kalosStart = 650;
+  static const int kalosEnd = 721;
+  static const int alolaStart = 722;
+  static const int alolaEnd = 809;
+  static const int galarStart = 810;
+  static const int galarEnd = 905;
+  static const int paldeaStart = 906;
+  static const int paldeaEnd = 1010;
 
-// Regional pokedex indexes
-const int absoluteStart = 1;
-const int absoluteEnd = 1010;
-const int kantoStart = 1;
-const int kantoEnd = 151;
-const int jhotoStart = 152;
-const int jhotoEnd = 251;
-const int hoennStart = 252;
-const int hoennEnd = 386;
-const int sinnohStart = 387;
-const int sinnohEnd = 493;
-const int unovaStart = 494;
-const int unovaEnd = 649;
-const int kalosStart = 650;
-const int kalosEnd = 721;
-const int alolaStart = 722;
-const int alolaEnd = 809;
-const int galarStart = 810;
-const int galarEnd = 905;
-const int paldeaStart = 906;
-const int paldeaEnd = 1010;
+  //Style constants
+  static TextStyle coloredTextStyle(
+      BuildContext context, Color color, TextStyle baseStyle) {
+    return TextStyle(
+      color: color,
+      fontFamily: baseStyle.fontFamily,
+      fontFamilyFallback: baseStyle.fontFamilyFallback,
+      fontFeatures: baseStyle.fontFeatures,
+      fontSize: baseStyle.fontSize,
+      fontStyle: baseStyle.fontStyle,
+      fontVariations: baseStyle.fontVariations,
+      fontWeight: baseStyle.fontWeight,
+      foreground: baseStyle.foreground,
+      wordSpacing: baseStyle.wordSpacing,
+      height: baseStyle.height,
+      overflow: baseStyle.overflow,
+      textBaseline: baseStyle.textBaseline,
+      decorationThickness: baseStyle.decorationThickness,
+      background: baseStyle.background,
+      backgroundColor: baseStyle.backgroundColor,
+      decorationColor: baseStyle.decorationColor,
+      debugLabel: baseStyle.debugLabel,
+      decoration: baseStyle.decoration,
+      decorationStyle: baseStyle.decorationStyle,
+      leadingDistribution: baseStyle.leadingDistribution,
+      letterSpacing: baseStyle.letterSpacing,
+      locale: baseStyle.locale,
+      shadows: baseStyle.shadows,
+    );
+  }
+}

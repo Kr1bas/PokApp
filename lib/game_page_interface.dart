@@ -1,10 +1,5 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:pokapp/constants.dart';
 import 'package:pokapp/parallax_scrolling.dart';
-import 'dart:math';
-import 'package:pokapp/leaderbord.dart';
 
 abstract class GameHomePage extends StatelessWidget {
   const GameHomePage({super.key, required this.gameID, required this.title});

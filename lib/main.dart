@@ -36,15 +36,15 @@ class MyHomePage extends StatelessWidget {
   List<DisplayPageItem> getHomePageList() {
     final widgets = <DisplayPageItem>[];
     widgets.add(DisplayPageItem(
-      navigateTo: NumberGuesserHomePage(
-          gameID: numberGuesserID, title: "PokAPP Number Guesser"),
+      navigateTo: const NumberGuesserHomePage(
+          gameID: Costants.numberGuesserID, title: "PokAPP Number Guesser"),
       title: "Number Guesser",
       subTitle: "Guess the pokedex number",
       assetImage: "assets/images/other/pkdex_guess.png",
     ));
     widgets.add(DisplayPageItem(
       navigateTo: const GenerationGuesserHomePage(
-        gameID: generationGuesserID,
+        gameID: Costants.generationGuesserID,
         title: "PokAPP Generation Guesser",
       ),
       title: "Generation Guesser",

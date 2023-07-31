@@ -1,4 +1,4 @@
-import 'package:flutter/foundation.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:pokapp/constants.dart';
@@ -16,16 +16,30 @@ class GenerationGuesserHomePage extends GameHomePage {
     final widgets = <DisplayPageItem>[];
     widgets.add(DisplayPageItem(
       navigateTo: GenerationGuesserGamePage(
-        categoryID: 'all',
+        categoryID: Costants.categoryAll,
         gameID: gameID,
         title: title,
-        rangeEnd: absoluteEnd,
-        rangeStart: absoluteStart,
+        rangeEnd: Costants.absoluteEnd,
+        rangeStart: Costants.absoluteStart,
         maxLives: 3,
         inputMaxLength: 1,
       ),
       title: "Every Generation!",
       subTitle: "Only every pokemon ever made!",
+      assetImage: "assets/images/other/pk_wp_3.jpg",
+    ));
+    widgets.add(DisplayPageItem(
+      navigateTo: GenerationGuesserShadowGamePage(
+        categoryID: Costants.categoryShadow,
+        gameID: gameID,
+        title: title,
+        rangeEnd: Costants.absoluteEnd,
+        rangeStart: Costants.absoluteStart,
+        maxLives: 3,
+        inputMaxLength: 1,
+      ),
+      title: "Shadow!",
+      subTitle: "Every pokemon ever made, but with a twist!",
       assetImage: "assets/images/other/pk_wp_3.jpg",
     ));
     return widgets;
@@ -61,19 +75,272 @@ class _GenerationGuesserGamePageState extends State<GenerationGuesserGamePage> {
   int _currentLife = -1;
   final List<int> _alreadyExtracted = [];
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  final GlobalKey<FormState> _leaderboardFormKey = GlobalKey<FormState>();
+  final _inputTextController = TextEditingController();
+  final _leaderboardInputTextController = TextEditingController();
+  bool _leaderboardSubmitted = false;
+  final Random _rng = Random();
+  late final Leaderboard _leaderboard;
+
+  int _generation(int index) {
+    if (index <= Costants.kantoEnd) return 1;
+    if (index <= Costants.jhotoEnd) return 2;
+    if (index <= Costants.hoennEnd) return 3;
+    if (index <= Costants.sinnohEnd) return 4;
+    if (index <= Costants.unovaEnd) return 5;
+    if (index <= Costants.kalosEnd) return 6;
+    if (index <= Costants.alolaEnd) return 7;
+    if (index <= Costants.galarEnd) return 8;
+    if (index <= Costants.paldeaEnd) return 9;
+    return -1;
+  }
+
+  bool _isCorrectAnswer({required String answer, required int currentPick}) {
+    return int.parse(answer) == _generation(currentPick);
+  }
+
+  @override
+  void initState() {
+    Leaderboard.getLeaderboard(game: widget.gameID, category: widget.categoryID)
+        .then((value) {
+      _leaderboard = value;
+    });
+    super.initState();
+  }
+
+  void _start() {
+    _currentLife = widget.maxLives;
+    _currentPick = _rng.nextInt(widget.rangeEnd) + widget.rangeStart;
+    _alreadyExtracted.add(_currentPick);
+    setState(() {});
+  }
+
+  void _next() {
+    if (_formKey.currentState!.validate()) {
+      if (_isCorrectAnswer(
+          answer: _inputTextController.text, currentPick: _currentPick)) {
+        _currentScore += 1;
+        do {
+          _currentPick = _rng.nextInt(widget.rangeEnd - widget.rangeStart) +
+              widget.rangeStart;
+        } while (_alreadyExtracted.contains(_currentPick));
+        _alreadyExtracted.add(_currentPick);
+      } else {
+        _currentLife -= 1;
+      }
+      _formKey.currentState!.reset();
+    }
+  }
+
+  void _restart() {
+    _formKey.currentState?.reset();
+
+    _currentLife = widget.maxLives;
+    _alreadyExtracted.removeWhere((e) => true);
+    _currentPick = -1;
+    setState(() {
+      // TODO finish
+    });
+  }
+
+  void _submit() {
+    if (_leaderboardFormKey.currentState!.validate() &&
+        !_leaderboardSubmitted) {
+      _leaderboard.uploadScoreToLeaderboard(
+          username: _leaderboardInputTextController.text,
+          score: _currentScore,
+          timestamp: Timestamp.now());
+    }
+  }
+
+  List<Widget> _getCurrentLifeIcons() {
+    List<Widget> icons = [];
+    for (var i = 0; i < _currentLife; i++) {
+      icons.add(const Icon(
+        Icons.favorite,
+        color: Colors.red,
+      ));
+    }
+    for (var i = 0; i < (widget.maxLives - _currentLife); i++) {
+      icons.add(const Icon(
+        Icons.heart_broken,
+        color: Colors.black12,
+      ));
+    }
+    return icons;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    Widget child;
+    if (_currentPick == -1) {
+      child = Center(
+        child: ElevatedButton(
+          onPressed: (() => _start()),
+          child: const Text("START!"),
+        ),
+      );
+    } else if (_currentLife == 0) {
+      child = Column(mainAxisAlignment: MainAxisAlignment.center, children: [
+        ListTile(
+          title: Text(
+            "Leaderboard:",
+            style: Costants.coloredTextStyle(context, Colors.black,
+                Theme.of(context).textTheme.headlineSmall!),
+            textAlign: TextAlign.left,
+          ),
+        ),
+        FutureBuilder(
+          future: _leaderboard.getLeaderboardTable(context),
+          builder: ((context, snapshot) {
+            if (snapshot.hasError) return Text(snapshot.error.toString());
+            if (!snapshot.hasData) return const CircularProgressIndicator();
+
+            return Padding(
+              padding: const EdgeInsets.all(5),
+              child: Table(
+                border: TableBorder.all(borderRadius: BorderRadius.circular(8)),
+                defaultVerticalAlignment: TableCellVerticalAlignment.middle,
+                children: snapshot.data!,
+              ),
+            );
+          }),
+        ),
+        const Divider(),
+        ListTile(
+          title: const Text("You final score is:"),
+          trailing: Text("$_currentScore"),
+        ),
+        Form(
+            key: _leaderboardFormKey,
+            child: Column(
+              children: [
+                TextFormField(
+                  controller: _leaderboardInputTextController,
+                  keyboardType: TextInputType.text,
+                  autocorrect: false,
+                  decoration:
+                      const InputDecoration(hintText: "Insert Generation here"),
+                  maxLength: 20,
+                  maxLengthEnforcement:
+                      MaxLengthEnforcement.truncateAfterCompositionEnds,
+                  validator: ((value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Please enter a value';
+                    }
+                    return null;
+                  }),
+                ),
+                ElevatedButton(
+                  onPressed: (() => _submit()),
+                  child: const Text("Submit result!"),
+                ),
+              ],
+            )),
+        const Divider(),
+        ElevatedButton(
+          onPressed: (() => _restart()),
+          child: const Text("RESTART!"),
+        )
+      ]);
+    } else {
+      child = Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          textBaseline: TextBaseline.alphabetic,
+          children: [
+            Text(
+              "Current Score: $_currentScore",
+              style: Theme.of(context).textTheme.headlineSmall,
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: _getCurrentLifeIcons(),
+            ),
+            AspectRatio(
+              aspectRatio: 4 / 3,
+              child: Image.asset(
+                "assets/images/dex/${_currentPick < 10 ? '00$_currentPick' : (_currentPick < 100 ? '0$_currentPick' : '$_currentPick')}.png",
+                fit: BoxFit.contain,
+              ),
+            ),
+            Form(
+              key: _formKey,
+              child: SizedBox(
+                width: 250,
+                child: TextFormField(
+                  controller: _inputTextController,
+                  decoration:
+                      const InputDecoration(hintText: "Insert Generation here"),
+                  keyboardType: TextInputType.number,
+                  autocorrect: false,
+                  maxLength: widget.inputMaxLength,
+                  maxLengthEnforcement:
+                      MaxLengthEnforcement.truncateAfterCompositionEnds,
+                  validator: ((value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Please enter a value';
+                    }
+                    int ival = int.parse(value);
+                    if (ival < 1 || ival > 9) {
+                      return 'Value must be between 1 and 9.';
+                    }
+                    return null;
+                  }),
+                ),
+              ),
+            ),
+            ElevatedButton(
+                onPressed: () => setState(() => _next()),
+                child: const Text("Next!")),
+          ]);
+    }
+    return GamePageScaffold(title: widget.title, child: child);
+  }
+}
+
+class GenerationGuesserShadowGamePage extends StatefulWidget {
+  const GenerationGuesserShadowGamePage({
+    super.key,
+    required this.title,
+    required this.gameID,
+    required this.categoryID,
+    required this.rangeEnd,
+    required this.rangeStart,
+    required this.maxLives,
+    required this.inputMaxLength,
+  });
+  final String title;
+  final String gameID;
+  final String categoryID;
+  final int rangeStart;
+  final int rangeEnd;
+  final int maxLives;
+  final int inputMaxLength;
+  @override
+  State<GenerationGuesserShadowGamePage> createState() =>
+      _GenerationGuesserShadowGamePageState();
+}
+
+class _GenerationGuesserShadowGamePageState
+    extends State<GenerationGuesserShadowGamePage> {
+  int _currentScore = 0;
+  int _currentPick = -1;
+  int _currentLife = -1;
+  final List<int> _alreadyExtracted = [];
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   final _inputTextController = TextEditingController();
   final Random _rng = Random();
 
   int _generation(int index) {
-    if (index <= kantoEnd) return 1;
-    if (index <= jhotoEnd) return 2;
-    if (index <= hoennEnd) return 3;
-    if (index <= sinnohEnd) return 4;
-    if (index <= unovaEnd) return 5;
-    if (index <= kalosEnd) return 6;
-    if (index <= alolaEnd) return 7;
-    if (index <= galarEnd) return 8;
-    if (index <= paldeaEnd) return 9;
+    if (index <= Costants.kantoEnd) return 1;
+    if (index <= Costants.jhotoEnd) return 2;
+    if (index <= Costants.hoennEnd) return 3;
+    if (index <= Costants.sinnohEnd) return 4;
+    if (index <= Costants.unovaEnd) return 5;
+    if (index <= Costants.kalosEnd) return 6;
+    if (index <= Costants.alolaEnd) return 7;
+    if (index <= Costants.galarEnd) return 8;
+    if (index <= Costants.paldeaEnd) return 9;
     return -1;
   }
 
@@ -88,7 +355,9 @@ class _GenerationGuesserGamePageState extends State<GenerationGuesserGamePage> {
         game: widget.gameID,
         category: widget.categoryID,
       );
-      print(ldb.toString());
+      ldb.leaderboardMembers.forEach((element) {
+        print(element.score);
+      });
     } catch (e) {
       print(e.toString());
     }
@@ -196,9 +465,12 @@ class _GenerationGuesserGamePageState extends State<GenerationGuesserGamePage> {
             ),
             AspectRatio(
               aspectRatio: 4 / 3,
-              child: Image.asset(
-                "assets/images/dex/${_currentPick < 10 ? '00$_currentPick' : (_currentPick < 100 ? '0$_currentPick' : '$_currentPick')}.png",
-                fit: BoxFit.contain,
+              child: ImageIcon(
+                Image.asset(
+                  "assets/images/dex/${_currentPick < 10 ? '00$_currentPick' : (_currentPick < 100 ? '0$_currentPick' : '$_currentPick')}.png",
+                  fit: BoxFit.contain,
+                ).image,
+                size: MediaQuery.of(context).size.height / 10,
               ),
             ),
             Form(
