@@ -3,35 +3,8 @@ version: '3'
 services:
   pokappweb:
     image: httpd
-    environment:
-      DB_HOST: pokappweb-database
-      DB_DB: pokappweb
-      DB_USER: pokappadmin
-      DB_PWD: RlJPTSBodHRwZDpsYXRlc3QKCkNP
-      DB_PORT: 3306
     ports:
       - 8080:80
-    depends_on:
-      - pokappweb-database
     volumes:
       - ./build/web:/usr/local/apache2/htdocs
-    networks:
-      - pokappweb-net
     restart: unless-stopped
-
-  pokappweb-database:
-    image: mariadb
-    restart: unless-stopped
-    environment:
-      MARIADB_DATABASE: pokappweb
-      MARIADB_USER: pokappadmin
-      MARIADB_PASSWORD: RlJPTSBodHRwZDpsYXRlc3QKCkNP
-      MARIADB_RANDOM_ROOT_PASSWORD: 'yes'
-    volumes:
-      - ./dbinit.sql:/docker-entrypoint-initdb.d/init.sql:ro
-      - ./.db:/var/lib/mysql
-    networks:
-      - pokappweb-net
-
-networks:
-  pokappweb-net:

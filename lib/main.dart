@@ -23,6 +23,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'PokAPP',
       theme: ThemeData(
+        fontFamily: "VT323",
         primarySwatch: Colors.red,
       ),
       home: const MyHomePage(),

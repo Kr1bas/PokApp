@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
-import 'main.dart';
 
 class DisplayPageItem extends StatelessWidget {
   DisplayPageItem(

@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:pokapp/main.dart';
 
 class Costants {
   // Various constants
@@ -9,9 +8,17 @@ class Costants {
   static const String numberGuesserID = 'numberGuesser';
   static const String categoryAll = 'all';
   static const String categoryShadow = 'shadow';
+  static const String categoryKanto = 'kanto';
+  static const String categoryJhoto = 'jhoto';
+  static const String categoryHoenn = 'hoenn';
+  static const String categorySinnoh = 'sinnoh';
+  static const String categoryUnova = 'unova';
+  static const String categoryKalos = 'kalos';
+  static const String categoryAlola = 'alola';
+  static const String categoryGalar = 'galar';
+  static const String categoryPaldea = 'paldea';
   // Regional pokedex indexes
-  static const int absoluteStart = 1;
-  static const int absoluteEnd = 1010;
+
   static const int kantoStart = 1;
   static const int kantoEnd = 151;
   static const int jhotoStart = 152;
@@ -30,7 +37,8 @@ class Costants {
   static const int galarEnd = 905;
   static const int paldeaStart = 906;
   static const int paldeaEnd = 1010;
-
+  static const int absoluteStart = kantoStart;
+  static const int absoluteEnd = paldeaEnd;
   //Style constants
   static TextStyle coloredTextStyle(
       BuildContext context, Color color, TextStyle baseStyle) {

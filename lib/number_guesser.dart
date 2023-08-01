@@ -1,9 +1,9 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:pokapp/constants.dart';
-import 'dart:html';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:pokapp/game_page_interface.dart';
+import 'package:pokapp/leaderbord.dart';
 import 'package:pokapp/parallax_scrolling.dart';
 import 'dart:math';
 
@@ -18,63 +18,101 @@ class NumberGuesserHomePage extends GameHomePage {
     final widgets = <DisplayPageItem>[];
     widgets.add(DisplayPageItem(
       navigateTo: NumberGuesserGamePage(
-          min: Costants.kantoStart, max: Costants.kantoEnd, title: title),
+          gameID: gameID,
+          categoryID: Costants.categoryKanto,
+          rangeStart: Costants.kantoStart,
+          rangeEnd: Costants.kantoEnd,
+          title: title),
       title: "First Generation",
       subTitle: "Only the original 151!",
       assetImage: "assets/images/covers/pk_frlg.jpg",
     ));
     widgets.add(DisplayPageItem(
         navigateTo: NumberGuesserGamePage(
-            min: Costants.jhotoStart, max: Costants.jhotoEnd, title: title),
+            gameID: gameID,
+            categoryID: Costants.categoryJhoto,
+            rangeStart: Costants.jhotoStart,
+            rangeEnd: Costants.jhotoEnd,
+            title: title),
         title: "Second Generation",
         subTitle: "Only Pokemons from the Jhoto region!",
         assetImage: "assets/images/covers/pk_hgss.jpg"));
     widgets.add(DisplayPageItem(
         navigateTo: NumberGuesserGamePage(
-            min: Costants.hoennStart, max: Costants.hoennEnd, title: title),
+            gameID: gameID,
+            categoryID: Costants.categoryHoenn,
+            rangeStart: Costants.hoennStart,
+            rangeEnd: Costants.hoennEnd,
+            title: title),
         title: "Third Generation",
         subTitle: "Only Pokemons from the Hoenn region!",
         assetImage: "assets/images/covers/pk_rs.jpg"));
     widgets.add(DisplayPageItem(
         navigateTo: NumberGuesserGamePage(
-            min: Costants.sinnohStart, max: Costants.sinnohEnd, title: title),
+            gameID: gameID,
+            categoryID: Costants.categorySinnoh,
+            rangeStart: Costants.sinnohStart,
+            rangeEnd: Costants.sinnohEnd,
+            title: title),
         title: "Fourth Generation",
         subTitle: "Only Pokemons from the Sinnoh region!",
         assetImage: "assets/images/covers/pk_dp.jpg"));
     widgets.add(DisplayPageItem(
         navigateTo: NumberGuesserGamePage(
-            min: Costants.unovaStart, max: Costants.unovaEnd, title: title),
+            gameID: gameID,
+            categoryID: Costants.categoryUnova,
+            rangeStart: Costants.unovaStart,
+            rangeEnd: Costants.unovaEnd,
+            title: title),
         title: "Fifth Generation",
         subTitle: "Only Pokemons from the Unima/Unova region!",
         assetImage: "assets/images/covers/pk_bw.jpg"));
     widgets.add(DisplayPageItem(
         navigateTo: NumberGuesserGamePage(
-            min: Costants.kalosStart, max: Costants.kalosEnd, title: title),
+            gameID: gameID,
+            categoryID: Costants.categoryKalos,
+            rangeStart: Costants.kalosStart,
+            rangeEnd: Costants.kalosEnd,
+            title: title),
         title: "Sixth Generation",
         subTitle: "Only Pokemons from the Kalos region!",
         assetImage: "assets/images/covers/pk_xy.jpg"));
     widgets.add(DisplayPageItem(
         navigateTo: NumberGuesserGamePage(
-            min: Costants.alolaStart, max: Costants.alolaEnd, title: title),
+            gameID: gameID,
+            categoryID: Costants.categoryAlola,
+            rangeStart: Costants.alolaStart,
+            rangeEnd: Costants.alolaEnd,
+            title: title),
         title: "Seventh Generation",
         subTitle: "Only Pokemons from the Alola region!",
         assetImage: "assets/images/covers/pk_usum.jpg"));
     widgets.add(DisplayPageItem(
         navigateTo: NumberGuesserGamePage(
-            min: Costants.galarStart, max: Costants.galarEnd, title: title),
+            gameID: gameID,
+            categoryID: Costants.categoryGalar,
+            rangeStart: Costants.galarStart,
+            rangeEnd: Costants.galarEnd,
+            title: title),
         title: "Eighth Generation",
         subTitle: "Only Pokemons from the Galar/Isui region!",
         assetImage: "assets/images/covers/pk_ss.jpg"));
     widgets.add(DisplayPageItem(
         navigateTo: NumberGuesserGamePage(
-            min: Costants.paldeaStart, max: Costants.paldeaEnd, title: title),
+            gameID: gameID,
+            categoryID: Costants.categoryPaldea,
+            rangeStart: Costants.paldeaStart,
+            rangeEnd: Costants.paldeaEnd,
+            title: title),
         title: "Nineth Generation",
         subTitle: "Only Pokemons from the Paldea region!",
         assetImage: "assets/images/covers/pk_sv.jpg"));
     widgets.add(DisplayPageItem(
         navigateTo: NumberGuesserGamePage(
-            min: Costants.absoluteStart,
-            max: Costants.absoluteEnd,
+            gameID: gameID,
+            categoryID: Costants.categoryAll,
+            rangeStart: Costants.absoluteStart,
+            rangeEnd: Costants.absoluteEnd,
             title: title),
         title: "Easy Mode",
         subTitle: "Don't worry you'll find out soon enough!",
@@ -86,15 +124,20 @@ class NumberGuesserHomePage extends GameHomePage {
 class NumberGuesserGamePage extends StatefulWidget {
   const NumberGuesserGamePage(
       {super.key,
-      required this.max,
-      required this.min,
+      required this.rangeEnd,
+      required this.rangeStart,
+      required this.gameID,
+      required this.categoryID,
       required this.title,
       this.maxLives = Costants.maxLives});
 
   final String title;
-  final int max;
-  final int min;
+  final int rangeEnd;
+  final int rangeStart;
   final int maxLives;
+  final String gameID;
+  final String categoryID;
+
   @override
   State<NumberGuesserGamePage> createState() => _NumberGuesserGamePageState();
 }
@@ -111,14 +154,27 @@ class _NumberGuesserGamePageState extends State<NumberGuesserGamePage> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   final _inputTextController = TextEditingController();
   final Random _rng = Random();
+  final GlobalKey<FormState> _leaderboardFormKey = GlobalKey<FormState>();
+  final _leaderboardInputTextController = TextEditingController();
+  bool _leaderboardSubmitted = false;
+  late final Leaderboard _leaderboard;
+
+  @override
+  void initState() {
+    Leaderboard.getLeaderboard(game: widget.gameID, category: widget.categoryID)
+        .then((value) {
+      _leaderboard = value;
+    });
+    super.initState();
+  }
 
   int _calculateScore({required int answer, required int extracted}) {
     if (answer == extracted) return 10;
     if ((answer == extracted - 1) || (answer == extracted + 1)) return 8;
-    if ((answer >= extracted - 5) && (answer <= extracted + 5)) return 6;
-    if ((answer >= extracted - 10) && (answer <= extracted + 10)) return 4;
-    if ((answer >= extracted - 20) && (answer <= extracted + 20)) return 2;
-    if ((answer >= extracted - 30) && (answer <= extracted + 30)) return 1;
+    if ((answer >= extracted - 2) && (answer <= extracted + 2)) return 6;
+    if ((answer >= extracted - 4) && (answer <= extracted + 4)) return 4;
+    if ((answer >= extracted - 8) && (answer <= extracted + 8)) return 2;
+    if ((answer >= extracted - 16) && (answer <= extracted + 16)) return 1;
     return -1;
   }
 
@@ -127,12 +183,16 @@ class _NumberGuesserGamePageState extends State<NumberGuesserGamePage> {
     _currentLife = widget.maxLives;
     _alreadyExtracted.removeWhere((element) => true);
     _currentScore = 0;
-    setState(() {});
+    _scoreDelta = 0;
+    _lifeDelta = 0;
+    _correctMessage = const Text("");
+    _start();
   }
 
   void _start() {
     _currentLife = 3;
-    _currentPick = _rng.nextInt(widget.max - widget.min) + widget.min;
+    _currentPick =
+        _rng.nextInt(widget.rangeEnd - widget.rangeStart) + widget.rangeStart;
     _alreadyExtracted.add(_currentPick);
     setState(() {});
   }
@@ -197,11 +257,12 @@ class _NumberGuesserGamePageState extends State<NumberGuesserGamePage> {
       }
       _formKey.currentState!.reset();
     }
-    if (_alreadyExtracted.length == (widget.max - widget.min)) {
+    if (_alreadyExtracted.length == (widget.rangeEnd - widget.rangeStart)) {
       _endOfGame = true;
     }
     do {
-      _currentPick = _rng.nextInt(widget.max - widget.min) + widget.min;
+      _currentPick =
+          _rng.nextInt(widget.rangeEnd - widget.rangeStart) + widget.rangeStart;
     } while (_alreadyExtracted.contains(_currentPick));
     _alreadyExtracted.add(_currentPick);
     setState(() {});
@@ -238,26 +299,121 @@ class _NumberGuesserGamePageState extends State<NumberGuesserGamePage> {
     return icons;
   }
 
+  void _submit() {
+    if (_leaderboardSubmitted) return;
+    if (_leaderboardFormKey.currentState!.validate()) {
+      _leaderboard.uploadScoreToLeaderboard(
+        score: LeaderboardMember(
+            name: _leaderboardInputTextController.text,
+            score: _currentScore,
+            timestamp: Timestamp.now()),
+      );
+      _leaderboardSubmitted = true;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    print(_currentPick);
     Widget child;
     if (_currentPick == -1) {
-      child = Center(
-        child: ElevatedButton(
-          onPressed: (() => _start()),
-          child: const Text("START!"),
-        ),
-      );
+      child = Column(
+          mainAxisSize: MainAxisSize.min,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Image.asset("assets/images/other/pk_oak_frlg.png"),
+            const Text(
+              "Rules:",
+              style: TextStyle(fontFamily: "VT323", fontSize: 20),
+            ),
+            Center(
+              child: Stack(children: <Widget>[
+                Image.asset("assets/images/other/pk_textbox.png",
+                    width: 400, height: 190, fit: BoxFit.fill),
+                const SizedBox(
+                  width: 400,
+                  child: AspectRatio(
+                    aspectRatio: 4 / 1.9,
+                    child: Center(
+                      child: Padding(
+                        padding: EdgeInsets.only(left: 8, top: 2),
+                        child: Text(
+                          "You have to guess the Pokédex number of the shown Pokémon.\nScoring goes as follows:\n+ 10 Pts & +1 Life (Max 3) for the correct number;\n+ 8 Pts for number ± 1;\n+ 6 Pts for the number ±2;\n+ 4 Pts for the number ±4\n+ 2 Pts for the number ± 8;\n+ 1 Pts for the number ± 16;\n+ 0 Pts & -1 Life otherwise;",
+                          style: TextStyle(fontFamily: "VT323"),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ]),
+            ),
+            Center(
+              child: ElevatedButton(
+                onPressed: (() => _start()),
+                child: const Text("START!"),
+              ),
+            ),
+          ]);
     } else if (_currentLife == 0 || _endOfGame) {
-      child = Column(children: [
-        SizedBox(
-          width: 300,
-          child: ListTile(
-            title: const Text("You final score is:"),
-            trailing: Text("$_currentScore"),
+      child = Column(mainAxisAlignment: MainAxisAlignment.center, children: [
+        ListTile(
+          title: Text(
+            "Leaderboard:",
+            style: Costants.coloredTextStyle(context, Colors.black,
+                Theme.of(context).textTheme.headlineSmall!),
+            textAlign: TextAlign.left,
           ),
         ),
+        FutureBuilder(
+          future: _leaderboard.getLeaderboardTable(context),
+          builder: ((context, snapshot) {
+            if (snapshot.hasError) return Text(snapshot.error.toString());
+            if (!snapshot.hasData) return const CircularProgressIndicator();
+
+            return Padding(
+              padding: const EdgeInsets.all(5),
+              child: Table(
+                border: TableBorder.all(borderRadius: BorderRadius.circular(8)),
+                defaultVerticalAlignment: TableCellVerticalAlignment.middle,
+                children: snapshot.data!,
+              ),
+            );
+          }),
+        ),
+        const Divider(),
+        ListTile(
+          title: const Text("You final score is:"),
+          trailing: Text("$_currentScore"),
+        ),
+        Form(
+            key: _leaderboardFormKey,
+            child: Column(
+              children: [
+                SizedBox(
+                  width: 250,
+                  child: TextFormField(
+                    controller: _leaderboardInputTextController,
+                    keyboardType: TextInputType.text,
+                    autocorrect: false,
+                    decoration: const InputDecoration(
+                        hintText: "Insert username for submission here."),
+                    maxLength: 20,
+                    maxLengthEnforcement:
+                        MaxLengthEnforcement.truncateAfterCompositionEnds,
+                    validator: ((value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Please enter a value';
+                      }
+                      return null;
+                    }),
+                  ),
+                ),
+                ElevatedButton(
+                  onPressed: (() => _submit()),
+                  child: const Text("Submit result!"),
+                ),
+              ],
+            )),
+        const Divider(),
         ElevatedButton(
           onPressed: (() => _restart()),
           child: const Text("RESTART!"),
@@ -310,8 +466,8 @@ class _NumberGuesserGamePageState extends State<NumberGuesserGamePage> {
                         return 'Please enter a value';
                       }
                       int ival = int.parse(value);
-                      if (ival < widget.min || ival > widget.max) {
-                        return 'Value must be between ${widget.min} and ${widget.max}.';
+                      if (ival < widget.rangeStart || ival > widget.rangeEnd) {
+                        return 'Value must be between ${widget.rangeStart} and ${widget.rangeEnd}.';
                       }
                       return null;
                     }),

@@ -40,7 +40,7 @@ class GenerationGuesserHomePage extends GameHomePage {
       ),
       title: "Shadow!",
       subTitle: "Every pokemon ever made, but with a twist!",
-      assetImage: "assets/images/other/pk_wp_3.jpg",
+      assetImage: "assets/images/other/pk_who.jpg",
     ));
     return widgets;
   }
@@ -54,7 +54,7 @@ class GenerationGuesserGamePage extends StatefulWidget {
     required this.categoryID,
     required this.rangeEnd,
     required this.rangeStart,
-    required this.maxLives,
+    this.maxLives = Costants.maxLives,
     required this.inputMaxLength,
   });
   final String title;
@@ -81,6 +81,8 @@ class _GenerationGuesserGamePageState extends State<GenerationGuesserGamePage> {
   bool _leaderboardSubmitted = false;
   final Random _rng = Random();
   late final Leaderboard _leaderboard;
+  int _scoreDelta = 0;
+  int _lifeDelta = 0;
 
   int _generation(int index) {
     if (index <= Costants.kantoEnd) return 1;
@@ -116,10 +118,13 @@ class _GenerationGuesserGamePageState extends State<GenerationGuesserGamePage> {
   }
 
   void _next() {
+    _scoreDelta = 0;
+    _lifeDelta = 0;
     if (_formKey.currentState!.validate()) {
       if (_isCorrectAnswer(
           answer: _inputTextController.text, currentPick: _currentPick)) {
         _currentScore += 1;
+        _scoreDelta = 1;
         do {
           _currentPick = _rng.nextInt(widget.rangeEnd - widget.rangeStart) +
               widget.rangeStart;
@@ -127,6 +132,7 @@ class _GenerationGuesserGamePageState extends State<GenerationGuesserGamePage> {
         _alreadyExtracted.add(_currentPick);
       } else {
         _currentLife -= 1;
+        _lifeDelta = -1;
       }
       _formKey.currentState!.reset();
     }
@@ -134,22 +140,24 @@ class _GenerationGuesserGamePageState extends State<GenerationGuesserGamePage> {
 
   void _restart() {
     _formKey.currentState?.reset();
-
     _currentLife = widget.maxLives;
-    _alreadyExtracted.removeWhere((e) => true);
-    _currentPick = -1;
-    setState(() {
-      // TODO finish
-    });
+    _alreadyExtracted.removeWhere((element) => true);
+    _currentScore = 0;
+    _scoreDelta = 0;
+    _lifeDelta = 0;
+    _start();
   }
 
   void _submit() {
-    if (_leaderboardFormKey.currentState!.validate() &&
-        !_leaderboardSubmitted) {
+    if (_leaderboardSubmitted) return;
+    if (_leaderboardFormKey.currentState!.validate()) {
       _leaderboard.uploadScoreToLeaderboard(
-          username: _leaderboardInputTextController.text,
-          score: _currentScore,
-          timestamp: Timestamp.now());
+        score: LeaderboardMember(
+            name: _leaderboardInputTextController.text,
+            score: _currentScore,
+            timestamp: Timestamp.now()),
+      );
+      _leaderboardSubmitted = true;
     }
   }
 
@@ -161,10 +169,24 @@ class _GenerationGuesserGamePageState extends State<GenerationGuesserGamePage> {
         color: Colors.red,
       ));
     }
-    for (var i = 0; i < (widget.maxLives - _currentLife); i++) {
+    for (var i = 0; i < (Costants.maxLives - _currentLife); i++) {
       icons.add(const Icon(
         Icons.heart_broken,
         color: Colors.black12,
+      ));
+    }
+    if (_lifeDelta > 0) {
+      icons.add(Text(
+        ' +$_lifeDelta',
+        style: Costants.coloredTextStyle(
+            context, Colors.green, Theme.of(context).textTheme.headlineSmall!),
+      ));
+    }
+    if (_lifeDelta < 0) {
+      icons.add(Text(
+        ' $_lifeDelta',
+        style: Costants.coloredTextStyle(
+            context, Colors.red, Theme.of(context).textTheme.headlineSmall!),
       ));
     }
     return icons;
@@ -174,12 +196,43 @@ class _GenerationGuesserGamePageState extends State<GenerationGuesserGamePage> {
   Widget build(BuildContext context) {
     Widget child;
     if (_currentPick == -1) {
-      child = Center(
-        child: ElevatedButton(
-          onPressed: (() => _start()),
-          child: const Text("START!"),
-        ),
-      );
+      child = Column(
+          mainAxisSize: MainAxisSize.min,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Image.asset("assets/images/other/pk_oak_frlg.png"),
+            const Text(
+              "Rules:",
+              style: TextStyle(fontFamily: "VT323", fontSize: 20),
+            ),
+            Center(
+              child: Stack(children: <Widget>[
+                Image.asset("assets/images/other/pk_textbox.png",
+                    width: 400, height: 120, fit: BoxFit.fill),
+                const SizedBox(
+                  width: 370,
+                  child: AspectRatio(
+                    aspectRatio: 4 / 1.2,
+                    child: Center(
+                      child: Padding(
+                        padding: EdgeInsets.only(left: 23, top: 2),
+                        child: Text(
+                          "You have to guess the Generation in which the shown Pokémon was released.\nScoring goes as follows:\n+ 1 Pts for the correct number;\n+ 0 Pts & -1 Life otherwise;",
+                          style: TextStyle(fontFamily: "VT323"),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ]),
+            ),
+            Center(
+              child: ElevatedButton(
+                onPressed: (() => _start()),
+                child: const Text("START!"),
+              ),
+            ),
+          ]);
     } else if (_currentLife == 0) {
       child = Column(mainAxisAlignment: MainAxisAlignment.center, children: [
         ListTile(
@@ -215,21 +268,24 @@ class _GenerationGuesserGamePageState extends State<GenerationGuesserGamePage> {
             key: _leaderboardFormKey,
             child: Column(
               children: [
-                TextFormField(
-                  controller: _leaderboardInputTextController,
-                  keyboardType: TextInputType.text,
-                  autocorrect: false,
-                  decoration:
-                      const InputDecoration(hintText: "Insert Generation here"),
-                  maxLength: 20,
-                  maxLengthEnforcement:
-                      MaxLengthEnforcement.truncateAfterCompositionEnds,
-                  validator: ((value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Please enter a value';
-                    }
-                    return null;
-                  }),
+                SizedBox(
+                  width: 250,
+                  child: TextFormField(
+                    controller: _leaderboardInputTextController,
+                    keyboardType: TextInputType.text,
+                    autocorrect: false,
+                    decoration: const InputDecoration(
+                        hintText: "Insert username for submission here."),
+                    maxLength: 20,
+                    maxLengthEnforcement:
+                        MaxLengthEnforcement.truncateAfterCompositionEnds,
+                    validator: ((value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Please enter a value';
+                      }
+                      return null;
+                    }),
+                  ),
                 ),
                 ElevatedButton(
                   onPressed: (() => _submit()),
@@ -248,10 +304,17 @@ class _GenerationGuesserGamePageState extends State<GenerationGuesserGamePage> {
           mainAxisAlignment: MainAxisAlignment.center,
           textBaseline: TextBaseline.alphabetic,
           children: [
-            Text(
-              "Current Score: $_currentScore",
-              style: Theme.of(context).textTheme.headlineSmall,
-            ),
+            Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+              Text(
+                "Current Score: $_currentScore",
+                style: Theme.of(context).textTheme.headlineSmall,
+              ),
+              Text(
+                _scoreDelta > 0 ? '+$_scoreDelta' : '',
+                style: Costants.coloredTextStyle(context, Colors.green,
+                    Theme.of(context).textTheme.headlineSmall!),
+              ),
+            ]),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: _getCurrentLifeIcons(),
@@ -328,8 +391,24 @@ class _GenerationGuesserShadowGamePageState
   int _currentLife = -1;
   final List<int> _alreadyExtracted = [];
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  final GlobalKey<FormState> _leaderboardFormKey = GlobalKey<FormState>();
   final _inputTextController = TextEditingController();
+  final _leaderboardInputTextController = TextEditingController();
+  bool _leaderboardSubmitted = false;
   final Random _rng = Random();
+  late final Leaderboard _leaderboard;
+  int _scoreDelta = 0;
+  int _lifeDelta = 0;
+  Widget _correctMessage = const Text("");
+
+  @override
+  void initState() {
+    Leaderboard.getLeaderboard(game: widget.gameID, category: widget.categoryID)
+        .then((value) {
+      _leaderboard = value;
+    });
+    super.initState();
+  }
 
   int _generation(int index) {
     if (index <= Costants.kantoEnd) return 1;
@@ -344,25 +423,24 @@ class _GenerationGuesserShadowGamePageState
     return -1;
   }
 
+  void _submit() {
+    if (_leaderboardSubmitted) return;
+    if (_leaderboardFormKey.currentState!.validate()) {
+      _leaderboard.uploadScoreToLeaderboard(
+        score: LeaderboardMember(
+            name: _leaderboardInputTextController.text,
+            score: _currentScore,
+            timestamp: Timestamp.now()),
+      );
+      _leaderboardSubmitted = true;
+    }
+  }
+
   bool _isCorrectAnswer({required String answer, required int currentPick}) {
     return int.parse(answer) == _generation(currentPick);
   }
 
   void _start() async {
-    //TEST
-    try {
-      final ldb = await Leaderboard.getLeaderboard(
-        game: widget.gameID,
-        category: widget.categoryID,
-      );
-      ldb.leaderboardMembers.forEach((element) {
-        print(element.score);
-      });
-    } catch (e) {
-      print(e.toString());
-    }
-    //ENDTEST
-
     _currentLife = widget.maxLives;
     _currentPick = _rng.nextInt(widget.rangeEnd) + widget.rangeStart;
     _alreadyExtracted.add(_currentPick);
@@ -370,10 +448,27 @@ class _GenerationGuesserShadowGamePageState
   }
 
   void _next() {
+    _scoreDelta = 0;
+    _lifeDelta = 0;
     if (_formKey.currentState!.validate()) {
       if (_isCorrectAnswer(
           answer: _inputTextController.text, currentPick: _currentPick)) {
         _currentScore += 1;
+        _scoreDelta = 1;
+        _correctMessage = Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const Text("Correct! Pokémon"),
+            SizedBox(
+              width: 30,
+              child: Image.asset(
+                "assets/images/dex/${_currentPick < 10 ? '00$_currentPick' : (_currentPick < 100 ? '0$_currentPick' : '$_currentPick')}.png",
+                fit: BoxFit.contain,
+              ),
+            ),
+            Text("is from generation: ${_inputTextController.text}"),
+          ],
+        );
         do {
           _currentPick = _rng.nextInt(widget.rangeEnd - widget.rangeStart) +
               widget.rangeStart;
@@ -381,6 +476,7 @@ class _GenerationGuesserShadowGamePageState
         _alreadyExtracted.add(_currentPick);
       } else {
         _currentLife -= 1;
+        _lifeDelta = -1;
       }
       _formKey.currentState!.reset();
     }
@@ -388,13 +484,13 @@ class _GenerationGuesserShadowGamePageState
 
   void _restart() {
     _formKey.currentState?.reset();
-
     _currentLife = widget.maxLives;
-    _alreadyExtracted.removeWhere((e) => true);
-    _currentPick = -1;
-    setState(() {
-      // TODO finish
-    });
+    _alreadyExtracted.removeWhere((element) => true);
+    _currentScore = 0;
+    _scoreDelta = 0;
+    _lifeDelta = 0;
+    _correctMessage = const Text("");
+    _start();
   }
 
   List<Widget> _getCurrentLifeIcons() {
@@ -405,10 +501,24 @@ class _GenerationGuesserShadowGamePageState
         color: Colors.red,
       ));
     }
-    for (var i = 0; i < (widget.maxLives - _currentLife); i++) {
+    for (var i = 0; i < (Costants.maxLives - _currentLife); i++) {
       icons.add(const Icon(
         Icons.heart_broken,
         color: Colors.black12,
+      ));
+    }
+    if (_lifeDelta > 0) {
+      icons.add(Text(
+        ' +$_lifeDelta',
+        style: Costants.coloredTextStyle(
+            context, Colors.green, Theme.of(context).textTheme.headlineSmall!),
+      ));
+    }
+    if (_lifeDelta < 0) {
+      icons.add(Text(
+        ' $_lifeDelta',
+        style: Costants.coloredTextStyle(
+            context, Colors.red, Theme.of(context).textTheme.headlineSmall!),
       ));
     }
     return icons;
@@ -418,33 +528,104 @@ class _GenerationGuesserShadowGamePageState
   Widget build(BuildContext context) {
     Widget child;
     if (_currentPick == -1) {
-      child = Center(
-        child: ElevatedButton(
-          onPressed: (() => _start()),
-          child: const Text("START!"),
-        ),
-      );
+      child = Column(
+          mainAxisSize: MainAxisSize.min,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Image.asset("assets/images/other/pk_oak_frlg.png"),
+            const Text(
+              "Rules:",
+              style: TextStyle(fontFamily: "VT323", fontSize: 20),
+            ),
+            Center(
+              child: Stack(children: <Widget>[
+                Image.asset("assets/images/other/pk_textbox.png",
+                    width: 400, height: 120, fit: BoxFit.fill),
+                const SizedBox(
+                  width: 370,
+                  child: AspectRatio(
+                    aspectRatio: 4 / 1.2,
+                    child: Center(
+                      child: Padding(
+                        padding: EdgeInsets.only(left: 23, top: 2),
+                        child: Text(
+                          "You have to guess the Generation in which the \"shown\" Pokémon was released.\nScoring goes as follows:\n+ 1 Pts for the correct number;\n+ 0 Pts & -1 Life otherwise;",
+                          style: TextStyle(fontFamily: "VT323"),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ]),
+            ),
+            Center(
+              child: ElevatedButton(
+                onPressed: (() => _start()),
+                child: const Text("START!"),
+              ),
+            ),
+          ]);
     } else if (_currentLife == 0) {
-      child = Column(children: [
+      child = Column(mainAxisAlignment: MainAxisAlignment.center, children: [
+        ListTile(
+          title: Text(
+            "Leaderboard:",
+            style: Costants.coloredTextStyle(context, Colors.black,
+                Theme.of(context).textTheme.headlineSmall!),
+            textAlign: TextAlign.left,
+          ),
+        ),
+        FutureBuilder(
+          future: _leaderboard.getLeaderboardTable(context),
+          builder: ((context, snapshot) {
+            if (snapshot.hasError) return Text(snapshot.error.toString());
+            if (!snapshot.hasData) return const CircularProgressIndicator();
+
+            return Padding(
+              padding: const EdgeInsets.all(5),
+              child: Table(
+                border: TableBorder.all(borderRadius: BorderRadius.circular(8)),
+                defaultVerticalAlignment: TableCellVerticalAlignment.middle,
+                children: snapshot.data!,
+              ),
+            );
+          }),
+        ),
+        const Divider(),
         ListTile(
           title: const Text("You final score is:"),
           trailing: Text("$_currentScore"),
         ),
-        /* FutureBuilder(
-                future: _getCurrentLeaderboard(),
-                builder: ((context, snapshot) {
-                  if (snapshot.hasError) {
-                    return Text(
-                        'Error retrieving the leaderboard:\n${snapshot.error.toString()}');
-                  }
-                  if (!snapshot.hasData) return const LinearProgressIndicator();
-                  return Padding(
-                    padding: const EdgeInsets.all(10),
-                    child: Column(
-                      children: snapshot.data!,
-                    ),
-                  );
-                })), */
+        Form(
+            key: _leaderboardFormKey,
+            child: Column(
+              children: [
+                SizedBox(
+                  width: 250,
+                  child: TextFormField(
+                    controller: _leaderboardInputTextController,
+                    keyboardType: TextInputType.text,
+                    autocorrect: false,
+                    decoration: const InputDecoration(
+                        hintText: "Insert username for submission here."),
+                    maxLength: 20,
+                    maxLengthEnforcement:
+                        MaxLengthEnforcement.truncateAfterCompositionEnds,
+                    validator: ((value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Please enter a value';
+                      }
+                      return null;
+                    }),
+                  ),
+                ),
+                ElevatedButton(
+                  onPressed: (() => _submit()),
+                  child: const Text("Submit result!"),
+                ),
+              ],
+            )),
+        const Divider(),
         ElevatedButton(
           onPressed: (() => _restart()),
           child: const Text("RESTART!"),
@@ -455,10 +636,17 @@ class _GenerationGuesserShadowGamePageState
           mainAxisAlignment: MainAxisAlignment.center,
           textBaseline: TextBaseline.alphabetic,
           children: [
-            Text(
-              "Current Score: $_currentScore",
-              style: Theme.of(context).textTheme.headlineSmall,
-            ),
+            Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+              Text(
+                "Current Score: $_currentScore",
+                style: Theme.of(context).textTheme.headlineSmall,
+              ),
+              Text(
+                _scoreDelta > 0 ? '+$_scoreDelta' : '',
+                style: Costants.coloredTextStyle(context, Colors.green,
+                    Theme.of(context).textTheme.headlineSmall!),
+              ),
+            ]),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: _getCurrentLifeIcons(),
@@ -499,6 +687,7 @@ class _GenerationGuesserShadowGamePageState
                 ),
               ),
             ),
+            _correctMessage,
             ElevatedButton(
                 onPressed: () => setState(() => _next()),
                 child: const Text("Next!")),

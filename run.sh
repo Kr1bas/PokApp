@@ -1,7 +1,8 @@
 #!/bin/zsh
 
 flutter build web
-docker image rm pokapp
-docker build -t pokapp .
-docker container rm pokapp-web
-docker run --name pokapp-web -p 8080:80 pokapp
+rm -rf ./archive
+mkdir archive
+cp -R ./build/web ./archive/src
+cp -R ./kube-manifest ./archive/kube-manifest
+cp ./Dockerfile ./archive

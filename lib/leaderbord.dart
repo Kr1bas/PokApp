@@ -1,9 +1,5 @@
-import 'dart:io';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:pokapp/constants.dart';
 
 class Leaderboard {
@@ -103,7 +99,7 @@ class Leaderboard {
                             ? Colors.grey
                             : leaderboardMembers.indexOf(e) == 2
                                 ? Colors.brown
-                                : Colors.white,
+                                : Colors.black,
                     Theme.of(context).textTheme.headlineSmall!),
               ),
             ),
@@ -147,9 +143,16 @@ class Leaderboard {
     return rows;
   }
 
-  void uploadScoreToLeaderboard(
-      {required String username, required int score, Timestamp? timestamp}) {
-    //todo implement
+  void uploadScoreToLeaderboard({required LeaderboardMember score}) async {
+    FirebaseFirestore.instance
+        .collection('leaderboards')
+        .doc(game)
+        .collection(category)
+        .doc(score.name)
+        .withConverter(
+            fromFirestore: LeaderboardMember.fromFirebase,
+            toFirestore: (e, _) => e.toFirestore())
+        .set(score);
   }
 }
 
@@ -167,9 +170,6 @@ class LeaderboardMember {
   factory LeaderboardMember.fromFirebase(
       DocumentSnapshot<Map<String, dynamic>> snapshot,
       SnapshotOptions? options) {
-    //final data = snapshot.data();
-    print(
-        "|${snapshot.id}|${snapshot.get('score')}|${snapshot.get('timestamp')}|");
     return LeaderboardMember(
         name: snapshot.id,
         score: snapshot.get('score'),
@@ -178,7 +178,6 @@ class LeaderboardMember {
 
   Map<String, dynamic> toFirestore() {
     return {
-      'name': name,
       'score': score,
       'timestamp': timestamp,
     };
