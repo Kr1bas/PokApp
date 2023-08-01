@@ -1,0 +1,7 @@
+{
+    "DB_HOST": "pokappweb-database",
+    "DB_DB": "pokappweb",
+    "DB_USER": "pokappadmin",
+    "DB_PWD": "RlJPTSBodHRwZDpsYXRlc3QKCkNP",
+    "DB_PORT": "3306"
+}
