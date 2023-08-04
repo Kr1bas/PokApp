@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:pokapp/generation_guesser.dart';
 
 import 'package:pokapp/constants.dart';
+import 'package:pokapp/name_guesser.dart';
 import 'package:pokapp/parallax_scrolling.dart';
 import 'package:pokapp/number_guesser.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -51,6 +52,15 @@ class MyHomePage extends StatelessWidget {
       title: "Generation Guesser",
       subTitle: "Guess from which generation the pokemon is.",
       assetImage: "assets/images/other/pkdex.png",
+    ));
+    widgets.add(DisplayPageItem(
+      navigateTo: const NameGuesserHomePage(
+        gameID: Costants.nameGuesserID,
+        title: "PokAPP Name Guesser",
+      ),
+      title: "Name Guesser",
+      subTitle: "Guess the pokemon name.",
+      assetImage: "assets/images/other/pk_who.jpg",
     ));
     return widgets;
   }

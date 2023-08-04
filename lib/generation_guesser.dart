@@ -73,7 +73,6 @@ class _GenerationGuesserGamePageState extends State<GenerationGuesserGamePage> {
   int _currentScore = 0;
   int _currentPick = -1;
   int _currentLife = -1;
-  final List<int> _alreadyExtracted = [];
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   final GlobalKey<FormState> _leaderboardFormKey = GlobalKey<FormState>();
   final _inputTextController = TextEditingController();
@@ -83,6 +82,8 @@ class _GenerationGuesserGamePageState extends State<GenerationGuesserGamePage> {
   late final Leaderboard _leaderboard;
   int _scoreDelta = 0;
   int _lifeDelta = 0;
+  bool _endOfGame = false;
+  final List<int> _validIndexes = [];
 
   int _generation(int index) {
     if (index <= Costants.kantoEnd) return 1;
@@ -111,9 +112,13 @@ class _GenerationGuesserGamePageState extends State<GenerationGuesserGamePage> {
   }
 
   void _start() {
+    _endOfGame = false;
+    _validIndexes.addAll([
+      for (var i = widget.rangeStart; i <= widget.rangeEnd; i++) i
+    ].where((element) => !_validIndexes.contains(element)));
     _currentLife = widget.maxLives;
-    _currentPick = _rng.nextInt(widget.rangeEnd) + widget.rangeStart;
-    _alreadyExtracted.add(_currentPick);
+    _currentPick = _validIndexes[_rng.nextInt(_validIndexes.length)];
+    _validIndexes.remove(_currentPick);
     setState(() {});
   }
 
@@ -125,11 +130,14 @@ class _GenerationGuesserGamePageState extends State<GenerationGuesserGamePage> {
           answer: _inputTextController.text, currentPick: _currentPick)) {
         _currentScore += 1;
         _scoreDelta = 1;
-        do {
-          _currentPick = _rng.nextInt(widget.rangeEnd - widget.rangeStart) +
-              widget.rangeStart;
-        } while (_alreadyExtracted.contains(_currentPick));
-        _alreadyExtracted.add(_currentPick);
+        if (_validIndexes.isEmpty) {
+          _endOfGame = true;
+        }
+        if (!_endOfGame) {
+          _currentPick =
+              _currentPick = _validIndexes[_rng.nextInt(_validIndexes.length)];
+          _validIndexes.remove(_currentPick);
+        }
       } else {
         _currentLife -= 1;
         _lifeDelta = -1;
@@ -139,9 +147,9 @@ class _GenerationGuesserGamePageState extends State<GenerationGuesserGamePage> {
   }
 
   void _restart() {
+    _leaderboardSubmitted = false;
     _formKey.currentState?.reset();
     _currentLife = widget.maxLives;
-    _alreadyExtracted.removeWhere((element) => true);
     _currentScore = 0;
     _scoreDelta = 0;
     _lifeDelta = 0;
@@ -149,15 +157,19 @@ class _GenerationGuesserGamePageState extends State<GenerationGuesserGamePage> {
   }
 
   void _submit() {
-    if (_leaderboardSubmitted) return;
     if (_leaderboardFormKey.currentState!.validate()) {
-      _leaderboard.uploadScoreToLeaderboard(
-        score: LeaderboardMember(
-            name: _leaderboardInputTextController.text,
-            score: _currentScore,
-            timestamp: Timestamp.now()),
-      );
-      _leaderboardSubmitted = true;
+      _leaderboard
+          .uploadScoreToLeaderboard(
+            score: LeaderboardMember(
+                name: _leaderboardInputTextController.text,
+                score: _currentScore,
+                timestamp: Timestamp.now()),
+          )
+          .then(
+              ((value) => _leaderboard.updateLeaderboardMembers().then((value) {
+                    _leaderboardSubmitted = true;
+                    setState(() {});
+                  })));
     }
   }
 
@@ -233,7 +245,7 @@ class _GenerationGuesserGamePageState extends State<GenerationGuesserGamePage> {
               ),
             ),
           ]);
-    } else if (_currentLife == 0) {
+    } else if (_currentLife == 0 || _endOfGame) {
       child = Column(mainAxisAlignment: MainAxisAlignment.center, children: [
         ListTile(
           title: Text(
@@ -283,6 +295,13 @@ class _GenerationGuesserGamePageState extends State<GenerationGuesserGamePage> {
                       if (value == null || value.isEmpty) {
                         return 'Please enter a value';
                       }
+                      if (_leaderboardSubmitted) {
+                        return "Score already submitted";
+                      }
+                      if ((_leaderboard.getMemberByUser(value)?.score ?? -1) >
+                          _currentScore) {
+                        return "User $value already has an higher score.";
+                      }
                       return null;
                     }),
                   ),
@@ -331,6 +350,7 @@ class _GenerationGuesserGamePageState extends State<GenerationGuesserGamePage> {
               child: SizedBox(
                 width: 250,
                 child: TextFormField(
+                  autofocus: true,
                   controller: _inputTextController,
                   decoration:
                       const InputDecoration(hintText: "Insert Generation here"),
@@ -389,7 +409,6 @@ class _GenerationGuesserShadowGamePageState
   int _currentScore = 0;
   int _currentPick = -1;
   int _currentLife = -1;
-  final List<int> _alreadyExtracted = [];
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   final GlobalKey<FormState> _leaderboardFormKey = GlobalKey<FormState>();
   final _inputTextController = TextEditingController();
@@ -400,6 +419,8 @@ class _GenerationGuesserShadowGamePageState
   int _scoreDelta = 0;
   int _lifeDelta = 0;
   Widget _correctMessage = const Text("");
+  bool _endOfGame = false;
+  final List<int> _validIndexes = [];
 
   @override
   void initState() {
@@ -407,6 +428,7 @@ class _GenerationGuesserShadowGamePageState
         .then((value) {
       _leaderboard = value;
     });
+
     super.initState();
   }
 
@@ -424,15 +446,19 @@ class _GenerationGuesserShadowGamePageState
   }
 
   void _submit() {
-    if (_leaderboardSubmitted) return;
     if (_leaderboardFormKey.currentState!.validate()) {
-      _leaderboard.uploadScoreToLeaderboard(
-        score: LeaderboardMember(
-            name: _leaderboardInputTextController.text,
-            score: _currentScore,
-            timestamp: Timestamp.now()),
-      );
-      _leaderboardSubmitted = true;
+      _leaderboard
+          .uploadScoreToLeaderboard(
+            score: LeaderboardMember(
+                name: _leaderboardInputTextController.text,
+                score: _currentScore,
+                timestamp: Timestamp.now()),
+          )
+          .then(
+              ((value) => _leaderboard.updateLeaderboardMembers().then((value) {
+                    _leaderboardSubmitted = true;
+                    setState(() {});
+                  })));
     }
   }
 
@@ -441,9 +467,13 @@ class _GenerationGuesserShadowGamePageState
   }
 
   void _start() async {
+    _endOfGame = false;
+    _validIndexes.addAll([
+      for (var i = widget.rangeStart; i <= widget.rangeEnd; i++) i
+    ].where((element) => !_validIndexes.contains(element)));
     _currentLife = widget.maxLives;
-    _currentPick = _rng.nextInt(widget.rangeEnd) + widget.rangeStart;
-    _alreadyExtracted.add(_currentPick);
+    _currentPick = _validIndexes[_rng.nextInt(_validIndexes.length)];
+    _validIndexes.remove(_currentPick);
     setState(() {});
   }
 
@@ -469,11 +499,14 @@ class _GenerationGuesserShadowGamePageState
             Text("is from generation: ${_inputTextController.text}"),
           ],
         );
-        do {
-          _currentPick = _rng.nextInt(widget.rangeEnd - widget.rangeStart) +
-              widget.rangeStart;
-        } while (_alreadyExtracted.contains(_currentPick));
-        _alreadyExtracted.add(_currentPick);
+        if (_validIndexes.isEmpty) {
+          _endOfGame = true;
+        }
+        if (!_endOfGame) {
+          _currentPick =
+              _currentPick = _validIndexes[_rng.nextInt(_validIndexes.length)];
+          _validIndexes.remove(_currentPick);
+        }
       } else {
         _currentLife -= 1;
         _lifeDelta = -1;
@@ -483,9 +516,9 @@ class _GenerationGuesserShadowGamePageState
   }
 
   void _restart() {
+    _leaderboardSubmitted = false;
     _formKey.currentState?.reset();
     _currentLife = widget.maxLives;
-    _alreadyExtracted.removeWhere((element) => true);
     _currentScore = 0;
     _scoreDelta = 0;
     _lifeDelta = 0;
@@ -565,7 +598,7 @@ class _GenerationGuesserShadowGamePageState
               ),
             ),
           ]);
-    } else if (_currentLife == 0) {
+    } else if (_currentLife == 0 || _endOfGame) {
       child = Column(mainAxisAlignment: MainAxisAlignment.center, children: [
         ListTile(
           title: Text(
@@ -614,6 +647,13 @@ class _GenerationGuesserShadowGamePageState
                     validator: ((value) {
                       if (value == null || value.isEmpty) {
                         return 'Please enter a value';
+                      }
+                      if (_leaderboardSubmitted) {
+                        return "Score already submitted";
+                      }
+                      if ((_leaderboard.getMemberByUser(value)?.score ?? -1) >
+                          _currentScore) {
+                        return "User $value already has an higher score.";
                       }
                       return null;
                     }),
@@ -666,6 +706,7 @@ class _GenerationGuesserShadowGamePageState
               child: SizedBox(
                 width: 250,
                 child: TextFormField(
+                  autofocus: true,
                   controller: _inputTextController,
                   decoration:
                       const InputDecoration(hintText: "Insert Generation here"),

@@ -1,21 +1,22 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:pokapp/constants.dart';
+import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:pokapp/constants.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:pokapp/game_page_interface.dart';
 import 'package:pokapp/leaderbord.dart';
 import 'package:pokapp/parallax_scrolling.dart';
-import 'dart:math';
+import 'package:pokapp/pokedex_handler.dart';
 
-class NumberGuesserHomePage extends GameHomePage {
-  const NumberGuesserHomePage(
+class NameGuesserHomePage extends GameHomePage {
+  const NameGuesserHomePage(
       {super.key, required super.gameID, required super.title});
 
   @override
   List<DisplayPageItem> getGamePageList() {
     final widgets = <DisplayPageItem>[];
     widgets.add(DisplayPageItem(
-      navigateTo: NumberGuesserGamePage(
+      navigateTo: NameGuesserGamePage(
           gameID: gameID,
           categoryID: Costants.categoryKanto,
           rangeStart: Costants.kantoStart,
@@ -26,7 +27,7 @@ class NumberGuesserHomePage extends GameHomePage {
       assetImage: "assets/images/covers/pk_frlg.jpg",
     ));
     widgets.add(DisplayPageItem(
-        navigateTo: NumberGuesserGamePage(
+        navigateTo: NameGuesserGamePage(
             gameID: gameID,
             categoryID: Costants.categoryJhoto,
             rangeStart: Costants.jhotoStart,
@@ -36,7 +37,7 @@ class NumberGuesserHomePage extends GameHomePage {
         subTitle: "Only Pokemons from the Jhoto region!",
         assetImage: "assets/images/covers/pk_hgss.jpg"));
     widgets.add(DisplayPageItem(
-        navigateTo: NumberGuesserGamePage(
+        navigateTo: NameGuesserGamePage(
             gameID: gameID,
             categoryID: Costants.categoryHoenn,
             rangeStart: Costants.hoennStart,
@@ -46,7 +47,7 @@ class NumberGuesserHomePage extends GameHomePage {
         subTitle: "Only Pokemons from the Hoenn region!",
         assetImage: "assets/images/covers/pk_rs.jpg"));
     widgets.add(DisplayPageItem(
-        navigateTo: NumberGuesserGamePage(
+        navigateTo: NameGuesserGamePage(
             gameID: gameID,
             categoryID: Costants.categorySinnoh,
             rangeStart: Costants.sinnohStart,
@@ -56,7 +57,7 @@ class NumberGuesserHomePage extends GameHomePage {
         subTitle: "Only Pokemons from the Sinnoh region!",
         assetImage: "assets/images/covers/pk_dp.jpg"));
     widgets.add(DisplayPageItem(
-        navigateTo: NumberGuesserGamePage(
+        navigateTo: NameGuesserGamePage(
             gameID: gameID,
             categoryID: Costants.categoryUnova,
             rangeStart: Costants.unovaStart,
@@ -66,7 +67,7 @@ class NumberGuesserHomePage extends GameHomePage {
         subTitle: "Only Pokemons from the Unima/Unova region!",
         assetImage: "assets/images/covers/pk_bw.jpg"));
     widgets.add(DisplayPageItem(
-        navigateTo: NumberGuesserGamePage(
+        navigateTo: NameGuesserGamePage(
             gameID: gameID,
             categoryID: Costants.categoryKalos,
             rangeStart: Costants.kalosStart,
@@ -76,7 +77,7 @@ class NumberGuesserHomePage extends GameHomePage {
         subTitle: "Only Pokemons from the Kalos region!",
         assetImage: "assets/images/covers/pk_xy.jpg"));
     widgets.add(DisplayPageItem(
-        navigateTo: NumberGuesserGamePage(
+        navigateTo: NameGuesserGamePage(
             gameID: gameID,
             categoryID: Costants.categoryAlola,
             rangeStart: Costants.alolaStart,
@@ -86,7 +87,7 @@ class NumberGuesserHomePage extends GameHomePage {
         subTitle: "Only Pokemons from the Alola region!",
         assetImage: "assets/images/covers/pk_usum.jpg"));
     widgets.add(DisplayPageItem(
-        navigateTo: NumberGuesserGamePage(
+        navigateTo: NameGuesserGamePage(
             gameID: gameID,
             categoryID: Costants.categoryGalar,
             rangeStart: Costants.galarStart,
@@ -96,7 +97,7 @@ class NumberGuesserHomePage extends GameHomePage {
         subTitle: "Only Pokemons from the Galar/Isui region!",
         assetImage: "assets/images/covers/pk_ss.jpg"));
     widgets.add(DisplayPageItem(
-        navigateTo: NumberGuesserGamePage(
+        navigateTo: NameGuesserGamePage(
             gameID: gameID,
             categoryID: Costants.categoryPaldea,
             rangeStart: Costants.paldeaStart,
@@ -106,7 +107,7 @@ class NumberGuesserHomePage extends GameHomePage {
         subTitle: "Only Pokemons from the Paldea region!",
         assetImage: "assets/images/covers/pk_sv.jpg"));
     widgets.add(DisplayPageItem(
-        navigateTo: NumberGuesserGamePage(
+        navigateTo: NameGuesserGamePage(
             gameID: gameID,
             categoryID: Costants.categoryAll,
             rangeStart: Costants.absoluteStart,
@@ -119,8 +120,8 @@ class NumberGuesserHomePage extends GameHomePage {
   }
 }
 
-class NumberGuesserGamePage extends StatefulWidget {
-  const NumberGuesserGamePage(
+class NameGuesserGamePage extends StatefulWidget {
+  const NameGuesserGamePage(
       {super.key,
       required this.rangeEnd,
       required this.rangeStart,
@@ -137,24 +138,25 @@ class NumberGuesserGamePage extends StatefulWidget {
   final String categoryID;
 
   @override
-  State<NumberGuesserGamePage> createState() => _NumberGuesserGamePageState();
+  State<NameGuesserGamePage> createState() => _NameGuesserGamePageState();
 }
 
-class _NumberGuesserGamePageState extends State<NumberGuesserGamePage> {
+class _NameGuesserGamePageState extends State<NameGuesserGamePage> {
   int _currentScore = 0;
   int _currentPick = -1;
   int _currentLife = -1;
-  bool _endOfGame = false;
-  Widget _correctMessage = const Text("");
-  int _scoreDelta = 0;
-  int _lifeDelta = 0;
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
-  final _inputTextController = TextEditingController();
-  final Random _rng = Random();
   final GlobalKey<FormState> _leaderboardFormKey = GlobalKey<FormState>();
+  String _selectedAnswer = "";
   final _leaderboardInputTextController = TextEditingController();
   bool _leaderboardSubmitted = false;
+  final Random _rng = Random();
   late final Leaderboard _leaderboard;
+  int _scoreDelta = 0;
+  int _lifeDelta = 0;
+  Widget _correctMessage = const Text("");
+  bool _endOfGame = false;
+  late final PokedexHandler _pokedex;
   final List<int> _validIndexes = [];
 
   @override
@@ -163,17 +165,91 @@ class _NumberGuesserGamePageState extends State<NumberGuesserGamePage> {
         .then((value) {
       _leaderboard = value;
     });
+    _pokedex = PokedexHandler(
+      rangeStart: widget.rangeStart,
+      rangeEnd: widget.rangeEnd,
+    );
     super.initState();
   }
 
-  int _calculateScore({required int answer, required int extracted}) {
-    if (answer == extracted) return 10;
-    if ((answer == extracted - 1) || (answer == extracted + 1)) return 8;
-    if ((answer >= extracted - 2) && (answer <= extracted + 2)) return 6;
-    if ((answer >= extracted - 4) && (answer <= extracted + 4)) return 4;
-    if ((answer >= extracted - 8) && (answer <= extracted + 8)) return 2;
-    if ((answer >= extracted - 16) && (answer <= extracted + 16)) return 1;
-    return -1;
+  void _submit() {
+    if (_leaderboardFormKey.currentState!.validate()) {
+      _leaderboard
+          .uploadScoreToLeaderboard(
+            score: LeaderboardMember(
+                name: _leaderboardInputTextController.text,
+                score: _currentScore,
+                timestamp: Timestamp.now()),
+          )
+          .then(
+              ((value) => _leaderboard.updateLeaderboardMembers().then((value) {
+                    _leaderboardSubmitted = true;
+                    setState(() {});
+                  })));
+    }
+  }
+
+  bool _isCorrectAnswer({required String answer, required int currentPick}) {
+    return _pokedex.isCorrectName(answer, currentPick);
+  }
+
+  void _start() async {
+    _endOfGame = false;
+    _validIndexes.addAll([
+      for (var i = widget.rangeStart; i <= widget.rangeEnd; i++) i
+    ].where((element) => !_validIndexes.contains(element)));
+    _currentLife = widget.maxLives;
+    _currentPick = _validIndexes[_rng.nextInt(_validIndexes.length)];
+    _validIndexes.remove(_currentPick);
+    setState(() {});
+  }
+
+  void _next() {
+    _scoreDelta = 0;
+    _lifeDelta = 0;
+    if (_selectedAnswer.trim() != "") {
+      if (_isCorrectAnswer(
+          answer: _selectedAnswer, currentPick: _currentPick)) {
+        _currentScore += 1;
+        _scoreDelta = 1;
+        _correctMessage = Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const Text("Correct! Pokémon"),
+            SizedBox(
+              width: 30,
+              child: Image.asset(
+                "assets/images/dex/${_currentPick < 10 ? '00$_currentPick' : (_currentPick < 100 ? '0$_currentPick' : '$_currentPick')}.png",
+                fit: BoxFit.contain,
+              ),
+            ),
+            Text("is: $_selectedAnswer"),
+          ],
+        );
+        if (_validIndexes.isEmpty) {
+          _endOfGame = true;
+        }
+        if (!_endOfGame) {
+          _currentPick =
+              _currentPick = _validIndexes[_rng.nextInt(_validIndexes.length)];
+          _validIndexes.remove(_currentPick);
+        }
+      } else {
+        _correctMessage = const Text(
+          "Wrong! Try again.",
+          style: TextStyle(color: Colors.red),
+        );
+        _currentLife -= 1;
+        _lifeDelta = -1;
+      }
+      _formKey.currentState!.reset();
+      _selectedAnswer = "";
+    } else {
+      _correctMessage = const Text(
+        "Please enter a name.",
+        style: TextStyle(color: Colors.red),
+      );
+    }
   }
 
   void _restart() {
@@ -187,88 +263,6 @@ class _NumberGuesserGamePageState extends State<NumberGuesserGamePage> {
     _start();
   }
 
-  void _start() {
-    _endOfGame = false;
-    _validIndexes.addAll([
-      for (var i = widget.rangeStart; i <= widget.rangeEnd; i++) i
-    ].where((element) => !_validIndexes.contains(element)));
-    _currentLife = widget.maxLives;
-    _currentPick = _validIndexes[_rng.nextInt(_validIndexes.length)];
-    _validIndexes.remove(_currentPick);
-    setState(() {});
-  }
-
-  void _next() {
-    _lifeDelta = 0;
-    if (_formKey.currentState!.validate()) {
-      _scoreDelta = _calculateScore(
-          answer: int.parse(_inputTextController.text),
-          extracted: _currentPick);
-      if (_scoreDelta > 0) {
-        _currentScore += _scoreDelta;
-        if (_scoreDelta == 10) {
-          _correctMessage = Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Text("Correct! Pokémon number ${_inputTextController.text} is: "),
-              SizedBox(
-                width: 20,
-                child: Image.asset(
-                  "assets/images/dex/${int.parse(_inputTextController.text) < 10 ? '00${int.parse(_inputTextController.text)}' : (int.parse(_inputTextController.text) < 100 ? '0${int.parse(_inputTextController.text)}' : '${int.parse(_inputTextController.text)}')}.png",
-                  fit: BoxFit.contain,
-                ),
-              ),
-            ],
-          );
-          if (_currentLife < widget.maxLives) {
-            _currentLife += 1;
-            _lifeDelta = 1;
-          }
-        } else {
-          _correctMessage = Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Text("Close! Pokémon number ${_inputTextController.text} is: "),
-              SizedBox(
-                width: 20,
-                child: Image.asset(
-                  "assets/images/dex/${int.parse(_inputTextController.text) < 10 ? '00${int.parse(_inputTextController.text)}' : (int.parse(_inputTextController.text) < 100 ? '0${int.parse(_inputTextController.text)}' : '${int.parse(_inputTextController.text)}')}.png",
-                  fit: BoxFit.contain,
-                ),
-              ),
-            ],
-          );
-        }
-      } else {
-        _correctMessage = Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text("Wrong! Pokémon number ${_inputTextController.text} is: "),
-            SizedBox(
-              width: 20,
-              child: Image.asset(
-                "assets/images/dex/${int.parse(_inputTextController.text) < 10 ? '00${int.parse(_inputTextController.text)}' : (int.parse(_inputTextController.text) < 100 ? '0${int.parse(_inputTextController.text)}' : '${int.parse(_inputTextController.text)}')}.png",
-                fit: BoxFit.contain,
-              ),
-            ),
-          ],
-        );
-        _currentLife -= 1;
-        _lifeDelta = -1;
-      }
-      _formKey.currentState!.reset();
-    }
-    if (_validIndexes.isEmpty) {
-      _endOfGame = true;
-    }
-    if (!_endOfGame) {
-      _currentPick =
-          _currentPick = _validIndexes[_rng.nextInt(_validIndexes.length)];
-      _validIndexes.remove(_currentPick);
-    }
-    setState(() {});
-  }
-
   List<Widget> _getCurrentLifeIcons() {
     List<Widget> icons = [];
     for (var i = 0; i < _currentLife; i++) {
@@ -277,7 +271,7 @@ class _NumberGuesserGamePageState extends State<NumberGuesserGamePage> {
         color: Colors.red,
       ));
     }
-    for (var i = 0; i < (widget.maxLives - _currentLife); i++) {
+    for (var i = 0; i < (Costants.maxLives - _currentLife); i++) {
       icons.add(const Icon(
         Icons.heart_broken,
         color: Colors.black12,
@@ -300,23 +294,6 @@ class _NumberGuesserGamePageState extends State<NumberGuesserGamePage> {
     return icons;
   }
 
-  void _submit() {
-    if (_leaderboardFormKey.currentState!.validate()) {
-      _leaderboard
-          .uploadScoreToLeaderboard(
-            score: LeaderboardMember(
-                name: _leaderboardInputTextController.text,
-                score: _currentScore,
-                timestamp: Timestamp.now()),
-          )
-          .then(
-              ((value) => _leaderboard.updateLeaderboardMembers().then((value) {
-                    _leaderboardSubmitted = true;
-                    setState(() {});
-                  })));
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     Widget child;
@@ -333,16 +310,16 @@ class _NumberGuesserGamePageState extends State<NumberGuesserGamePage> {
             Center(
               child: Stack(children: <Widget>[
                 Image.asset("assets/images/other/pk_textbox.png",
-                    width: 400, height: 190, fit: BoxFit.fill),
+                    width: 400, height: 120, fit: BoxFit.fill),
                 const SizedBox(
-                  width: 400,
+                  width: 370,
                   child: AspectRatio(
-                    aspectRatio: 4 / 1.9,
+                    aspectRatio: 4 / 1.2,
                     child: Center(
                       child: Padding(
-                        padding: EdgeInsets.only(left: 8, top: 2),
+                        padding: EdgeInsets.only(left: 23, top: 2),
                         child: Text(
-                          "You have to guess the Pokédex number of the shown Pokémon.\nScoring goes as follows:\n+ 10 Pts & +1 Life (Max 3) for the correct number;\n+ 8 Pts for number ± 1;\n+ 6 Pts for the number ±2;\n+ 4 Pts for the number ±4\n+ 2 Pts for the number ± 8;\n+ 1 Pts for the number ± 16;\n+ 0 Pts & -1 Life otherwise;",
+                          "You have to guess the name of the \"shown\" Pokémon.\nScoring goes as follows:\n+ 1 Pts for the correct name;\n+ 0 Pts & -1 Life otherwise;",
                           style: TextStyle(fontFamily: "VT323"),
                         ),
                       ),
@@ -396,6 +373,7 @@ class _NumberGuesserGamePageState extends State<NumberGuesserGamePage> {
                 SizedBox(
                   width: 250,
                   child: TextFormField(
+                    autofocus: true,
                     controller: _leaderboardInputTextController,
                     keyboardType: TextInputType.text,
                     autocorrect: false,
@@ -453,44 +431,62 @@ class _NumberGuesserGamePageState extends State<NumberGuesserGamePage> {
             ),
             AspectRatio(
               aspectRatio: 4 / 3,
-              child: Image.asset(
-                "assets/images/dex/${_currentPick < 10 ? '00$_currentPick' : (_currentPick < 100 ? '0$_currentPick' : '$_currentPick')}.png",
-                fit: BoxFit.contain,
+              child: ImageIcon(
+                Image.asset(
+                  "assets/images/dex/${_currentPick < 10 ? '00$_currentPick' : (_currentPick < 100 ? '0$_currentPick' : '$_currentPick')}.png",
+                  fit: BoxFit.contain,
+                ).image,
+                size: MediaQuery.of(context).size.height / 10,
               ),
             ),
             Form(
               key: _formKey,
-              child: Column(children: [
-                SizedBox(
-                  width: 250,
-                  child: TextFormField(
-                    autofocus: true,
-                    textInputAction: TextInputAction.done,
-                    controller: _inputTextController,
-                    decoration: const InputDecoration(
-                        hintText: "Insert Pokedex number here"),
-                    keyboardType: TextInputType.number,
-                    autocorrect: false,
-                    maxLength: 4,
-                    maxLengthEnforcement:
-                        MaxLengthEnforcement.truncateAfterCompositionEnds,
-                    validator: ((value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Please enter a value';
-                      }
-                      int ival = int.parse(value);
-                      if (ival < widget.rangeStart || ival > widget.rangeEnd) {
-                        return 'Value must be between ${widget.rangeStart} and ${widget.rangeEnd}.';
-                      }
-                      return null;
-                    }),
-                  ),
+              child: SizedBox(
+                width: 250,
+                child: Autocomplete<String>(
+                  optionsMaxHeight: 50,
+                  optionsBuilder: ((textEditingValue) {
+                    return _pokedex.getNamesList().where((String option) {
+                      return option
+                          .contains(textEditingValue.text.toLowerCase());
+                    });
+                  }),
+                  optionsViewBuilder: (context, onSelected, options) {
+                    return Align(
+                      alignment: Alignment.topLeft,
+                      child: Material(
+                        elevation: 4.0,
+                        child: SizedBox(
+                          width: 250,
+                          child: ListView.separated(
+                            shrinkWrap: true,
+                            padding: const EdgeInsets.all(8.0),
+                            itemCount: options.length,
+                            separatorBuilder: (context, i) {
+                              return const Divider();
+                            },
+                            itemBuilder: (context, index) {
+                              return ListTile(
+                                onTap: () =>
+                                    onSelected(options.elementAt(index)),
+                                title: Text(options.elementAt(index)),
+                              );
+                            },
+                          ),
+                        ),
+                      ),
+                    );
+                  },
+                  onSelected: (option) {
+                    _selectedAnswer = option;
+                  },
                 ),
-                _correctMessage,
-                ElevatedButton(
-                    onPressed: (() => _next()), child: const Text("Next!")),
-              ]),
+              ),
             ),
+            _correctMessage,
+            ElevatedButton(
+                onPressed: () => setState(() => _next()),
+                child: const Text("Next!")),
           ]);
     }
     return GamePageScaffold(title: widget.title, child: child);

@@ -143,7 +143,8 @@ class Leaderboard {
     return rows;
   }
 
-  void uploadScoreToLeaderboard({required LeaderboardMember score}) async {
+  Future<void> uploadScoreToLeaderboard(
+      {required LeaderboardMember score}) async {
     FirebaseFirestore.instance
         .collection('leaderboards')
         .doc(game)
@@ -153,6 +154,37 @@ class Leaderboard {
             fromFirestore: LeaderboardMember.fromFirebase,
             toFirestore: (e, _) => e.toFirestore())
         .set(score);
+  }
+
+  Future<void> updateLeaderboardMembers() async {
+    final db = FirebaseFirestore.instance;
+    final res = await db
+        .collection('leaderboards')
+        .doc(game)
+        .collection(category)
+        .orderBy('score', descending: true)
+        .limit(10)
+        .withConverter(
+            fromFirestore: LeaderboardMember.fromFirebase,
+            toFirestore: (e, _) => e.toFirestore())
+        .get();
+
+    leaderboardMembers.removeWhere((element) => true);
+    leaderboardMembers.addAll(res.docs.map((e) => e.data()));
+  }
+
+  bool containsUsername(String username) {
+    return leaderboardMembers.map((e) => e.name).contains(username);
+  }
+
+  LeaderboardMember? getMemberByUser(String username) {
+    if (!containsUsername(username)) return null;
+    for (var member in leaderboardMembers) {
+      if (member.name == username) {
+        return member;
+      }
+    }
+    return null;
   }
 }
 

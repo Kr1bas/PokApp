@@ -6,6 +6,7 @@ class Costants {
   // DB constants
   static const String generationGuesserID = 'generationGuesser';
   static const String numberGuesserID = 'numberGuesser';
+  static const String nameGuesserID = 'nameGuesser';
   static const String categoryAll = 'all';
   static const String categoryShadow = 'shadow';
   static const String categoryKanto = 'kanto';
@@ -20,7 +21,7 @@ class Costants {
   // Regional pokedex indexes
 
   static const int kantoStart = 1;
-  static const int kantoEnd = 151;
+  static const int kantoEnd = 10;
   static const int jhotoStart = 152;
   static const int jhotoEnd = 251;
   static const int hoennStart = 252;

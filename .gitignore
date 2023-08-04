@@ -46,3 +46,5 @@ app.*.map.json
 archive/
 kube-manifest/
 src.zip
+upload.sh
+scripts/
